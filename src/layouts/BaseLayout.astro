@@ -1,0 +1,617 @@
+---
+interface Props {
+  title: string
+  description?: string
+  ogImage?: string
+  ogType?: 'website' | 'article'
+  structuredData?: Record<string, unknown>
+  noindex?: boolean
+}
+
+const {
+  title,
+  description = 'AI会計ソフトの比較・レビュー、ChatGPT×経理の実践ガイド、AI監査・税務の最新ニュースを毎日配信。freee・マネーフォワード・弥生のAI機能をCPA試験合格者が徹底解説。',
+  ogImage,
+  ogType = 'website',
+  structuredData,
+  noindex = false,
+} = Astro.props
+
+const canonicalURL = new URL(Astro.url.pathname, Astro.site)
+const ogImageUrl = ogImage || new URL('/og-image.png', Astro.site).toString()
+---
+
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content={description} />
+    {noindex && <meta name="robots" content="noindex, follow" />}
+    <link rel="canonical" href={canonicalURL} />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="sitemap" href="/sitemap-index.xml" />
+    <link rel="alternate" type="application/rss+xml" title="Kaikei AI Daily" href={new URL('/rss.xml', Astro.site)} />
+
+    <!-- Google Search Console Verification -->
+    <meta name="google-site-verification" content="ZXqMQnfG0mF974xuFnRxjwiF6GmYSVoMHZZSt3jv-Zc" />
+
+    <!-- Fonts: preconnect for performance -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+JP:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap"
+      rel="stylesheet"
+    />
+
+    <!-- OGP -->
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:type" content={ogType} />
+    <meta property="og:url" content={canonicalURL} />
+    <meta property="og:image" content={ogImageUrl} />
+    <meta property="og:site_name" content="Kaikei AI Daily" />
+    <meta property="og:locale" content="ja_JP" />
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:site" content="@KaikeiAI_Lab" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={ogImageUrl} />
+
+    <title>{title} | Kaikei AI Daily</title>
+
+    <!-- Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-HGCVQ13PYZ" is:inline></script>
+    <script is:inline>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-HGCVQ13PYZ');
+    </script>
+
+    <!-- Google AdSense -->
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3306648647011539" crossorigin="anonymous" is:inline></script>
+
+    <!-- JSON-LD Structured Data -->
+    {structuredData && (
+      <script type="application/ld+json" set:html={JSON.stringify(structuredData)} />
+    )}
+  </head>
+  <body>
+    <!-- Skip link: WCAG 2.4.1 -->
+    <a href="#main-content" class="skip-link">メインコンテンツへスキップ</a>
+
+    <header class="site-header">
+      <nav class="nav-container" aria-label="メインナビゲーション">
+        <a href="/" class="logo" aria-label="Kaikei AI Daily ホーム">
+          <span class="logo-icon" aria-hidden="true">K</span>
+          <span class="logo-text">
+            Kaikei AI Daily
+            <span class="logo-sub">会計×AIニュース</span>
+          </span>
+        </a>
+
+        <!-- Desktop nav -->
+        <ul class="nav-links" role="list">
+          <li><a href="/">ニュース</a></li>
+          <li><a href="/weekly">週刊ダイジェスト</a></li>
+          <li><a href="/deep-dive">深掘り解説</a></li>
+          <li><a href="/tips">AI活用Tips</a></li>
+          <li><a href="/about">About</a></li>
+          <li><a href="/search">検索</a></li>
+          <li>
+            <a href="https://ezark-devtools.booth.pm/" target="_blank" rel="noopener" class="nav-cta">
+              プロンプト集
+            </a>
+          </li>
+        </ul>
+
+        <!-- Mobile hamburger button -->
+        <button
+          class="nav-toggle"
+          id="nav-toggle"
+          aria-label="メニューを開く"
+          aria-expanded="false"
+          aria-controls="nav-drawer"
+        >
+          <span class="hamburger-line" aria-hidden="true"></span>
+          <span class="hamburger-line" aria-hidden="true"></span>
+          <span class="hamburger-line" aria-hidden="true"></span>
+        </button>
+      </nav>
+
+      <!-- Mobile drawer -->
+      <div class="nav-drawer" id="nav-drawer" hidden>
+        <ul class="nav-links-mobile" role="list">
+          <li><a href="/">ニュース速報</a></li>
+          <li><a href="/weekly">週刊ダイジェスト</a></li>
+          <li><a href="/deep-dive">深掘り解説</a></li>
+          <li><a href="/tips">AI活用Tips</a></li>
+          <li><a href="/about">About</a></li>
+          <li><a href="/search">検索</a></li>
+          <li><a href="https://ezark-devtools.booth.pm/" target="_blank" rel="noopener">経理AIプロンプト集 (BOOTH)</a></li>
+        </ul>
+      </div>
+    </header>
+
+    <!-- Trust bar: 会計プロ向け信頼性訴求 -->
+    <div class="trust-bar" aria-label="サービス特徴">
+      <span class="trust-item">
+        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M20 13c0 5-3.5 7.5-8 8.5-4.5-1-8-3.5-8-8.5V6l8-3 8 3z"/>
+          <polyline points="9 12 11 14 15 10"/>
+        </svg>
+        CPA試験合格者監修
+      </span>
+      <span class="trust-sep" aria-hidden="true">·</span>
+      <span class="trust-item">
+        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M4 11a9 9 0 0 1 9 9"/><path d="M4 4a16 16 0 0 1 16 16"/><circle cx="5" cy="19" r="1"/>
+        </svg>
+        毎朝5:30 自動更新
+      </span>
+      <span class="trust-sep trust-sep--hide-mobile" aria-hidden="true">·</span>
+      <span class="trust-item trust-item--hide-mobile">
+        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+        </svg>
+        全記事無料
+      </span>
+      <span class="trust-sep trust-sep--hide-mobile" aria-hidden="true">·</span>
+      <span class="trust-item trust-item--hide-mobile">経理・会計・税務プロ向け</span>
+    </div>
+
+    <main id="main-content">
+      <slot />
+    </main>
+
+    <footer class="site-footer">
+      <div class="footer-container">
+        <div class="footer-brand">
+          <p class="footer-title">Kaikei AI Daily</p>
+          <p class="footer-tagline">経理・会計・税務プロのためのAIニュースサイト</p>
+          <p class="footer-note">CPA試験合格者監修 / 毎朝5:30自動更新 / 全記事無料</p>
+        </div>
+        <div class="footer-links">
+          <div class="footer-col">
+            <h3>コンテンツ</h3>
+            <ul>
+              <li><a href="/">ニュース速報</a></li>
+              <li><a href="/deep-dive">深掘り解説</a></li>
+              <li><a href="/tips">AI活用Tips</a></li>
+              <li><a href="/about">About</a></li>
+            </ul>
+          </div>
+          <div class="footer-col">
+            <h3>関連サービス</h3>
+            <ul>
+              <li><a href="https://x.com/KaikeiAI_Lab" target="_blank" rel="noopener">X (@KaikeiAI_Lab)</a></li>
+              <li><a href="https://ezark-tax-accounting.com/" target="_blank" rel="noopener">EZARK Blog (AI×税務・会計)</a></li>
+              <li><a href="https://note.com/ezark_company" target="_blank" rel="noopener">週刊AI会計レポート (note)</a></li>
+              <li><a href="https://ezark-devtools.booth.pm/" target="_blank" rel="noopener">経理AIプロンプト集 (BOOTH)</a></li>
+            </ul>
+          </div>
+          <div class="footer-col">
+            <h3>おすすめ経理ソフト</h3>
+            <ul>
+              <li><a href="https://px.a8.net/svt/ejp?a8mat=4AZ8K2+FBBEYA+3SPO+9FL80Y" target="_blank" rel="noopener sponsored">freee会計（広告）</a></li>
+              <li><a href="https://px.a8.net/svt/ejp?a8mat=4AZ8K2+F5D2WI+4JGQ+60WN6" target="_blank" rel="noopener sponsored">マネーフォワード クラウド会計（広告）</a></li>
+              <li><a href="https://px.a8.net/svt/ejp?a8mat=4AZ8K2+FCIA5U+4JGQ+BZ8OY" target="_blank" rel="noopener sponsored">MF 確定申告（広告）</a></li>
+              <li><a href="https://px.a8.net/svt/ejp?a8mat=4AZ9C6+FBWUK2+48D0+6A4FM" target="_blank" rel="noopener sponsored">FXTF — 狭スプレッドFX取引（広告）</a></li>
+            </ul>
+          </div>
+        </div>
+        <div class="footer-legal">
+          <p>&copy; 2026 Kaikei AI Daily. All rights reserved. | <a href="/privacy">プライバシーポリシー</a></p>
+          <p class="disclaimer">
+            本サイトの記事はAIによる自動収集・要約をベースに、CPA試験合格者が監修しています。
+            具体的な会計・税務判断は公認会計士・税理士にご相談ください。
+            フッターのリンクにはアフィリエイト広告（A8.net）が含まれます。
+          </p>
+        </div>
+      </div>
+    </footer>
+
+    <script>
+      const toggle = document.getElementById('nav-toggle')
+      const drawer = document.getElementById('nav-drawer')
+
+      toggle?.addEventListener('click', () => {
+        const isExpanded = toggle.getAttribute('aria-expanded') === 'true'
+        toggle.setAttribute('aria-expanded', String(!isExpanded))
+        toggle.setAttribute('aria-label', isExpanded ? 'メニューを開く' : 'メニューを閉じる')
+        if (drawer) drawer.hidden = isExpanded
+      })
+
+      drawer?.querySelectorAll('a').forEach((link) => {
+        link.addEventListener('click', () => {
+          if (drawer) drawer.hidden = true
+          toggle?.setAttribute('aria-expanded', 'false')
+          toggle?.setAttribute('aria-label', 'メニューを開く')
+        })
+      })
+    </script>
+
+    <script>
+      document.querySelectorAll('a[rel*="sponsored"]').forEach(link => {
+        link.addEventListener('click', () => {
+          if (typeof gtag === 'function') {
+            gtag('event', 'affiliate_click', {
+              event_category: 'monetization',
+              event_label: link.textContent?.trim() ?? '',
+              transport_type: 'beacon',
+            });
+          }
+        });
+      });
+    </script>
+
+    <style>
+      /* =============================================
+         Kaikei AI Daily Design System v4.0
+         ターゲット: 経理マネージャー / 若手会計士 / 税理士スタッフ
+         ============================================= */
+      :root {
+        --color-primary:            #0066cc;
+        --color-primary-hover:      #0052a3;
+        --color-on-primary:         #ffffff;
+        --color-secondary:          #1a1f36;
+        --color-surface:            #ffffff;
+        --color-on-surface:         #1a1f36;
+        --color-surface-variant:    #f4f6f9;
+        --color-on-surface-variant: #6b7280;
+        --color-outline:            #1a1f36;
+        --color-shadow:             rgba(26, 31, 54, 1);
+        --color-accent:             #16a34a;
+        --color-bg:                 #f4f6f9;
+        --color-border:             #e0e0e0;
+
+        --font-sans: 'Inter', 'Noto Sans JP', -apple-system, BlinkMacSystemFont, sans-serif;
+        --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
+        /* Type Scale (responsive - IBM Carbon) */
+        --type-h1: clamp(2rem, 4vw, 2.5rem);
+        --type-h2: clamp(1.5rem, 3vw, 1.75rem);
+        --type-h3: clamp(1.25rem, 2.5vw, 1.5rem);
+
+
+        --max-width: 1080px;
+      }
+
+      @media (prefers-color-scheme: dark) {
+        :root {
+          --color-primary:            #3385db;
+          --color-primary-hover:      #5599e0;
+          --color-on-primary:         #ffffff;
+          --color-secondary:          #3385db;
+          --color-surface:            #0f1117;
+          --color-on-surface:         #e4e6eb;
+          --color-surface-variant:    #1a1f36;
+          --color-on-surface-variant: #9ca3af;
+          --color-outline:            #3385db;
+          --color-shadow:             rgba(51, 133, 219, 0.5);
+          --color-accent:             #22c55e;
+          --color-bg:                 #0f1117;
+          --color-border:             #2a2f45;
+        }
+      }
+      /* Manual dark mode toggle (IBM Carbon) */
+      [data-theme='dark'] {
+        --color-primary: #3385db;
+        --color-on-primary: #ffffff;
+        --color-surface: #0f1117;
+        --color-on-surface: #e4e6eb;
+        --color-surface-variant: #1a1f36;
+        --color-on-surface-variant: #9ca3af;
+        --color-outline: #3385db;
+        --color-shadow: rgba(51, 133, 219, 0.5);
+        --color-bg: #0f1117;
+        --color-border: #2a2f45;
+      }
+
+
+      *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+      body {
+        font-family: var(--font-sans);
+        background: var(--color-bg);
+        color: var(--color-on-surface);
+        line-height: 1.75;
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+      }
+
+      /* Skip link */
+      .skip-link {
+        position: absolute;
+        top: -100%;
+        left: 0;
+        background: var(--color-primary);
+        color: var(--color-on-primary);
+        padding: 0.5rem 1rem;
+        font-size: 0.875rem;
+        font-weight: 600;
+        text-decoration: none;
+        z-index: 9999;
+        border: 3px solid var(--color-outline);
+      }
+      .skip-link:focus { top: 0; }
+
+      /* Focus states — WCAG 2.2 */
+      :focus-visible {
+        outline: 3px solid var(--color-primary);
+        outline-offset: 2px;
+      }
+
+      /* Header */
+      .site-header {
+        background: var(--color-surface);
+        border-bottom: 4px solid var(--color-outline);
+        position: sticky;
+        top: 0;
+        z-index: 100;
+      }
+
+      .nav-container {
+        max-width: var(--max-width);
+        margin: 0 auto;
+        padding: 0.625rem 1rem;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1rem;
+      }
+
+      .logo {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        text-decoration: none;
+        color: var(--color-on-surface);
+      }
+
+      .logo-icon {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 2rem;
+        height: 2rem;
+        background: var(--color-primary);
+        color: var(--color-on-primary);
+        font-weight: 800;
+        font-size: 1rem;
+        border: 3px solid var(--color-outline);
+        box-shadow: 3px 3px 0 var(--color-shadow);
+        flex-shrink: 0;
+      }
+
+      .logo-text {
+        font-weight: 700;
+        font-size: 1rem;
+        line-height: 1.2;
+        display: flex;
+        flex-direction: column;
+      }
+
+      .logo-sub {
+        font-size: 0.6rem;
+        font-weight: 500;
+        color: var(--color-on-surface-variant);
+        letter-spacing: 0.05em;
+      }
+
+      /* Desktop nav */
+      .nav-links {
+        display: flex;
+        list-style: none;
+        gap: 0.25rem;
+        align-items: center;
+      }
+
+      .nav-links a {
+        text-decoration: none;
+        color: var(--color-on-surface-variant);
+        font-size: 0.8125rem;
+        font-weight: 500;
+        transition: color 0.15s;
+        display: inline-flex;
+        align-items: center;
+        min-height: 44px;
+        padding: 0 0.5rem;
+      }
+
+      .nav-links a:hover { color: var(--color-primary); }
+
+      .nav-links a:focus-visible {
+        outline: 3px solid var(--color-primary);
+        outline-offset: 2px;
+      }
+
+      /* プロンプト集: Neo-Brutalism CTA */
+      .nav-cta {
+        background: var(--color-primary) !important;
+        color: white !important;
+        padding: 0.35rem 0.75rem !important;
+        font-weight: 600 !important;
+        border: 3px solid var(--color-outline) !important;
+        box-shadow: 4px 4px 0 var(--color-outline) !important;
+        min-height: 36px !important;
+        transition: transform 0.15s, box-shadow 0.15s !important;
+      }
+
+      .nav-cta:hover {
+        background: var(--color-primary-hover) !important;
+        transform: translate(-2px, -2px) !important;
+        box-shadow: 6px 6px 0 var(--color-outline) !important;
+      }
+
+      /* Hamburger */
+      .nav-toggle {
+        display: none;
+        flex-direction: column;
+        gap: 5px;
+        background: none;
+        border: 3px solid var(--color-outline);
+        padding: 10px;
+        cursor: pointer;
+        min-width: 44px;
+        min-height: 44px;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .nav-toggle:hover { background: var(--color-surface-variant); }
+      .nav-toggle:focus-visible { outline: 3px solid var(--color-primary); outline-offset: 2px; }
+
+      .hamburger-line {
+        display: block;
+        width: 20px;
+        height: 2px;
+        background: var(--color-on-surface);
+        transition: transform 0.2s, opacity 0.2s;
+        transform-origin: center;
+      }
+
+      .nav-toggle[aria-expanded="true"] .hamburger-line:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+      .nav-toggle[aria-expanded="true"] .hamburger-line:nth-child(2) { opacity: 0; }
+      .nav-toggle[aria-expanded="true"] .hamburger-line:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+      /* Mobile drawer */
+      .nav-drawer {
+        background: var(--color-surface);
+        border-bottom: 4px solid var(--color-outline);
+      }
+
+      .nav-links-mobile {
+        list-style: none;
+        max-width: var(--max-width);
+        margin: 0 auto;
+        padding: 0.5rem 1rem 1rem;
+        display: flex;
+        flex-direction: column;
+      }
+
+      .nav-links-mobile a {
+        display: flex;
+        align-items: center;
+        padding: 0.75rem 0.5rem;
+        font-size: 1rem;
+        font-weight: 500;
+        text-decoration: none;
+        color: var(--color-on-surface);
+        border-bottom: 1px solid var(--color-border);
+        min-height: 48px;
+        transition: color 0.15s;
+      }
+
+      .nav-links-mobile a:hover { color: var(--color-primary); }
+      .nav-links-mobile a:focus-visible { outline: 3px solid var(--color-primary); outline-offset: 2px; }
+
+      /* Trust bar */
+      .trust-bar {
+        background: var(--color-on-surface);
+        color: var(--color-surface-variant);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.875rem;
+        padding: 0.35rem 1rem;
+        font-size: 0.6875rem;
+        font-weight: 600;
+        letter-spacing: 0.02em;
+      }
+
+      .trust-item {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.25rem;
+      }
+
+      .trust-sep {
+        opacity: 0.4;
+        font-size: 0.875rem;
+      }
+
+      /* Main */
+      main {
+        flex: 1;
+        max-width: var(--max-width);
+        margin: 0 auto;
+        padding: 2rem 1rem;
+        width: 100%;
+      }
+
+      /* Footer */
+      
+      /* Tablet/Desktop breakpoints (IBM Carbon) */
+      @media (min-width: 768px) {
+        .persona-page { max-width: 768px; }
+      }
+      @media (min-width: 1024px) {
+        .persona-page { max-width: 900px; }
+      }
+
+      .site-footer {
+        background: var(--color-on-surface);
+        color: var(--color-surface-variant);
+        margin-top: auto;
+        border-top: 4px solid var(--color-primary);
+      }
+
+      .footer-container {
+        max-width: var(--max-width);
+        margin: 0 auto;
+        padding: 2rem 1rem;
+      }
+
+      .footer-brand { margin-bottom: 1.5rem; }
+      .footer-title { font-size: 1rem; font-weight: 700; color: white; }
+      .footer-tagline { font-size: 0.8125rem; opacity: 0.8; margin-top: 0.2rem; }
+      .footer-note { font-size: 0.6875rem; opacity: 0.6; margin-top: 0.2rem; }
+
+      .footer-links {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 2rem;
+        margin-bottom: 1.5rem;
+      }
+
+      .footer-col h3 { font-size: 0.75rem; font-weight: 600; color: white; margin-bottom: 0.5rem; }
+      .footer-col ul { list-style: none; }
+      .footer-col li { margin-bottom: 0.25rem; }
+      .footer-col a {
+        color: #9ca3af;
+        text-decoration: none;
+        font-size: 0.75rem;
+        transition: color 0.15s;
+      }
+      .footer-col a:hover { color: white; }
+
+      .footer-legal { border-top: 1px solid #333; padding-top: 1rem; font-size: 0.6875rem; opacity: 0.6; }
+      .disclaimer { margin-top: 0.4rem; font-size: 0.625rem; line-height: 1.5; }
+
+      /* Responsive */
+      @media (max-width: 640px) {
+        .nav-links { display: none; }
+        .nav-toggle { display: inline-flex; }
+        .trust-bar { gap: 0.5rem; padding: 0.35rem 0.75rem; }
+        .trust-sep--hide-mobile { display: none; }
+        .trust-item--hide-mobile { display: none; }
+        .footer-links { grid-template-columns: 1fr 1fr; }
+      }
+
+      @media (max-width: 400px) {
+        .footer-links { grid-template-columns: 1fr; gap: 1rem; }
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        *, *::before, *::after {
+          transition-duration: 0.01ms !important;
+          animation-duration: 0.01ms !important;
+        }
+      }
+    </style>
+  </body>
+</html>

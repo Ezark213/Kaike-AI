@@ -1,0 +1,345 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro'
+import AdUnit from '../../components/AdUnit.astro'
+import { getCollection } from 'astro:content'
+import { filterPublished } from '../../lib/date-filter'
+
+const allArticles = filterPublished(await getCollection('daily'))
+const articles = allArticles
+  .sort((a, b) => new Date(b.data.date).getTime() - new Date(a.data.date).getTime())
+
+const PAGE_SIZE = 20
+const totalPages = Math.ceil(articles.length / PAGE_SIZE)
+---
+
+<BaseLayout title="デイリーニュース一覧" description="AI×会計の最新ニュースを毎日配信。公認会計士試験合格者が監修する、経理・税務プロフェッショナルのためのデイリーニュース。">
+
+  <section class="section-header">
+    <div class="section-header-inner">
+      <div class="section-icon">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+      </div>
+      <div>
+        <h1>デイリーニュース一覧</h1>
+        <p>AI×会計の最新ニュースを毎日配信。CPA試験合格者が監修しています。</p>
+      </div>
+    </div>
+  </section>
+
+  <div class="article-list" id="article-list">
+    {articles.map((article, index) => (
+      <>
+        {/* フィード内広告: 5記事ごとに挿入 */}
+        {index > 0 && index % 5 === 0 && <AdUnit name="feedInline" />}
+        <article class="article-card" data-page={Math.floor(index / PAGE_SIZE) + 1}>
+          <div class="article-meta">
+            <time class="article-date" datetime={article.data.date}>{article.data.date}</time>
+            {article.data.tags.length > 0 && (
+              <span class="category-badge">{article.data.tags[0]}</span>
+            )}
+          </div>
+          <h2 class="article-title">
+            <a href={`/daily/${article.slug}`}>{article.data.title}</a>
+          </h2>
+          <p class="article-summary">{article.data.summary}</p>
+          <div class="article-tags">
+            {article.data.tags.map((tag) => (
+              <span class="tag">{tag}</span>
+            ))}
+          </div>
+          <a href={`/daily/${article.slug}`} class="read-more" aria-label={`${article.data.title} を読む`}>
+            記事を読む
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="9 18 15 12 9 6"/></svg>
+          </a>
+        </article>
+      </>
+    ))}
+  </div>
+
+  {totalPages > 1 && (
+    <nav class="pagination" id="pagination" aria-label="ページナビゲーション" data-total-pages={totalPages}>
+      <button class="pagination-btn pagination-prev" id="pagination-prev" disabled aria-label="前のページ">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="15 18 9 12 15 6"/></svg>
+        前へ
+      </button>
+      <div class="pagination-pages" id="pagination-pages"></div>
+      <button class="pagination-btn pagination-next" id="pagination-next" aria-label="次のページ">
+        次へ
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="9 18 15 12 9 6"/></svg>
+      </button>
+    </nav>
+  )}
+
+  <div class="article-count" id="article-count">
+    全 {articles.length} 件
+  </div>
+
+</BaseLayout>
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const pagination = document.getElementById('pagination')
+    if (!pagination) return
+
+    const totalPages = parseInt(pagination.dataset.totalPages || '1', 10)
+    let currentPage = 1
+
+    const params = new URLSearchParams(window.location.search)
+    const pageParam = parseInt(params.get('page') || '1', 10)
+    if (pageParam >= 1 && pageParam <= totalPages) {
+      currentPage = pageParam
+    }
+
+    const articles = document.querySelectorAll<HTMLElement>('.article-card')
+    const prevBtn = document.getElementById('pagination-prev') as HTMLButtonElement
+    const nextBtn = document.getElementById('pagination-next') as HTMLButtonElement
+    const pagesContainer = document.getElementById('pagination-pages')!
+    const countEl = document.getElementById('article-count')!
+
+    function showPage(page: number) {
+      currentPage = page
+
+      articles.forEach((article) => {
+        const articlePage = parseInt(article.dataset.page || '1', 10)
+        article.style.display = articlePage === currentPage ? '' : 'none'
+      })
+
+      prevBtn.disabled = currentPage <= 1
+      nextBtn.disabled = currentPage >= totalPages
+
+      renderPageNumbers()
+
+      const pageStart = (currentPage - 1) * 20 + 1
+      const pageEnd = Math.min(currentPage * 20, articles.length)
+      countEl.textContent = `${pageStart}-${pageEnd} / 全 ${articles.length} 件`
+
+      const url = new URL(window.location.href)
+      if (currentPage === 1) {
+        url.searchParams.delete('page')
+      } else {
+        url.searchParams.set('page', String(currentPage))
+      }
+      window.history.replaceState({}, '', url.toString())
+
+      window.scrollTo({ top: 0, behavior: 'smooth' })
+    }
+
+    function renderPageNumbers() {
+      pagesContainer.innerHTML = ''
+
+      for (let i = 1; i <= totalPages; i++) {
+        if (
+          i === 1 ||
+          i === totalPages ||
+          (i >= currentPage - 1 && i <= currentPage + 1)
+        ) {
+          const btn = document.createElement('button')
+          btn.className = 'pagination-page' + (i === currentPage ? ' active' : '')
+          btn.textContent = String(i)
+          btn.setAttribute('aria-label', `${i}ページ目`)
+          if (i === currentPage) btn.setAttribute('aria-current', 'page')
+          btn.addEventListener('click', () => showPage(i))
+          pagesContainer.appendChild(btn)
+        } else if (
+          i === currentPage - 2 ||
+          i === currentPage + 2
+        ) {
+          const ellipsis = document.createElement('span')
+          ellipsis.className = 'pagination-ellipsis'
+          ellipsis.textContent = '...'
+          pagesContainer.appendChild(ellipsis)
+        }
+      }
+    }
+
+    prevBtn.addEventListener('click', () => {
+      if (currentPage > 1) showPage(currentPage - 1)
+    })
+
+    nextBtn.addEventListener('click', () => {
+      if (currentPage < totalPages) showPage(currentPage + 1)
+    })
+
+    showPage(currentPage)
+  })
+</script>
+
+<style>
+  /* ── Section Header ── */
+  .section-header { margin-bottom: 2rem; }
+
+  .section-header-inner {
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+
+  .section-icon {
+    flex-shrink: 0;
+    width: 3rem;
+    height: 3rem;
+    background: var(--color-primary);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 3px solid var(--color-outline);
+  }
+
+  .section-header h1 { font-size: 1.75rem; font-weight: 800; margin-bottom: 0.25rem; }
+  .section-header p { color: var(--color-on-surface-variant); font-size: 0.9375rem; }
+
+  /* ── Article List ── */
+  .article-list { display: flex; flex-direction: column; gap: 1rem; }
+
+  /* ── Article Card (Neo-Brutalism) ── */
+  .article-card {
+    background: var(--color-surface);
+    border: 4px solid var(--color-outline);
+    box-shadow: 8px 8px 0 var(--color-shadow);
+    padding: 1.25rem;
+    transition: transform 0.15s, box-shadow 0.15s;
+  }
+
+  .article-card:hover {
+    transform: translate(-4px, -4px);
+    box-shadow: 12px 12px 0 var(--color-shadow);
+  }
+
+  .article-meta {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .article-date { font-size: 0.75rem; color: var(--color-on-surface-variant); font-family: var(--font-mono); }
+
+  .category-badge {
+    display: inline-block;
+    font-size: 0.6875rem;
+    font-weight: 700;
+    background: var(--color-primary);
+    color: white;
+    padding: 0.1rem 0.4rem;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+  }
+
+  .article-title { font-size: 1.0625rem; font-weight: 700; margin: 0 0 0.5rem; }
+  .article-title a { color: var(--color-on-surface); text-decoration: none; }
+  .article-title a:hover { color: var(--color-primary); }
+
+  .article-summary { font-size: 0.875rem; color: var(--color-on-surface-variant); line-height: 1.6; }
+
+  .article-tags { display: flex; gap: 0.375rem; margin-top: 0.75rem; flex-wrap: wrap; }
+  .tag {
+    font-size: 0.6875rem;
+    padding: 0.125rem 0.5rem;
+    background: var(--color-surface-variant);
+    border: 1px solid var(--color-border);
+    color: var(--color-on-surface-variant);
+    font-weight: 500;
+  }
+
+  .read-more {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    margin-top: 0.75rem;
+    font-size: 0.8125rem;
+    font-weight: 600;
+    color: var(--color-primary);
+    text-decoration: none;
+  }
+
+  .read-more:hover { text-decoration: underline; }
+
+  /* ── Pagination ── */
+  .pagination {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    margin-top: 2rem;
+    flex-wrap: wrap;
+  }
+
+  .pagination-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    padding: 0.5rem 1rem;
+    font-size: 0.8125rem;
+    font-weight: 700;
+    background: var(--color-surface);
+    color: var(--color-on-surface);
+    border: 3px solid var(--color-outline);
+    box-shadow: 4px 4px 0 var(--color-shadow);
+    cursor: pointer;
+    transition: transform 0.1s, box-shadow 0.1s;
+    min-height: 40px;
+  }
+
+  .pagination-btn:hover:not(:disabled) {
+    transform: translate(-2px, -2px);
+    box-shadow: 6px 6px 0 var(--color-shadow);
+  }
+
+  .pagination-btn:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+  }
+
+  .pagination-pages {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+  }
+
+  .pagination-page {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.25rem;
+    height: 2.25rem;
+    font-size: 0.8125rem;
+    font-weight: 600;
+    background: var(--color-surface);
+    color: var(--color-on-surface);
+    border: 3px solid var(--color-outline);
+    box-shadow: 3px 3px 0 var(--color-shadow);
+    cursor: pointer;
+    transition: transform 0.1s, box-shadow 0.1s;
+  }
+
+  .pagination-page:hover {
+    transform: translate(-2px, -2px);
+    box-shadow: 5px 5px 0 var(--color-shadow);
+  }
+
+  .pagination-page.active {
+    background: var(--color-primary);
+    color: white;
+    cursor: default;
+  }
+
+  .pagination-ellipsis {
+    font-size: 0.875rem;
+    color: var(--color-on-surface-variant);
+    padding: 0 0.25rem;
+  }
+
+  /* ── Article Count ── */
+  .article-count {
+    text-align: center;
+    margin-top: 1rem;
+    font-size: 0.75rem;
+    color: var(--color-on-surface-variant);
+    font-family: var(--font-mono);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .article-card, .pagination-btn, .pagination-page { transition: none; }
+  }
+</style>

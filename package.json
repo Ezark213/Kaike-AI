@@ -1,0 +1,25 @@
+{
+  "name": "kaikei-ai-daily",
+  "type": "module",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "astro dev",
+    "start": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "astro": "astro",
+    "postbuild": "npx pagefind --site dist --glob '**/*.html'",
+    "test": "vitest run",
+    "test:watch": "vitest"
+  },
+  "dependencies": {
+    "@astrojs/rss": "^4.0.2",
+    "@astrojs/sitemap": "^3.2.1",
+    "astro": "^4.4.0"
+  },
+  "devDependencies": {
+    "pagefind": "^1.4.0",
+    "vitest": "^4.1.0"
+  }
+}

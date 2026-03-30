@@ -1,0 +1,105 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro"
+import { getCollection } from "astro:content"
+import { filterPublished } from "../../lib/date-filter"
+
+const allDeepDive = filterPublished(await getCollection("deep-dive"))
+const allTips = filterPublished(await getCollection("tips"))
+
+const keiriTags = ["経理", "仕訳", "経費精算", "月次決算", "資金繰り", "給与計算", "業務効率化", "DX", "固定資産", "債権管理", "タスク管理", "freee", "マネーフォワード", "クラウド会計"]
+
+const deepDives = allDeepDive
+  .filter(a => a.data.tags.some(t => keiriTags.includes(t)))
+  .sort((a, b) => new Date(b.data.date).getTime() - new Date(a.data.date).getTime())
+
+const tips = allTips
+  .filter(a => a.data.tags.some(t => keiriTags.includes(t)))
+  .sort((a, b) => new Date(b.data.date).getTime() - new Date(a.data.date).getTime())
+  .slice(0, 4)
+
+const recommended = [
+  { slug: "ai-accounting-3sha-hikaku-2026", title: "AI会計ソフト3社徹底比較2026" },
+  { slug: "ai-keiri-task-kanri-2026", title: "AI×経理タスク管理2026" },
+  { slug: "ai-saiken-kanri-2026", title: "AI×債権管理・売掛金回収の自動化" },
+  { slug: "claude-keiri-katuyou-2026", title: "Claude×経理活用プロンプト10選" },
+  { slug: "ai-cashflow-management-2026", title: "AI×資金繰り管理" },
+]
+---
+
+<BaseLayout title="経理・財務担当者のためのAI活用ガイド" description="経理マネージャー・財務担当者向け。AI会計ソフト比較、月次決算の効率化、債権管理の自動化、ChatGPTプロンプト集など、経理DXの実践情報をCPA試験合格者が監修してお届けします。">
+  <main id="main-content" class="persona-page">
+    <section class="persona-hero keiri-hero">
+      <div class="persona-hero-inner">
+        <span class="persona-badge">経理・財務担当者向け</span>
+        <h1>AI会計ソフトで経理を変革する</h1>
+        <p>月次決算の効率化、債権管理の自動化、経費精算のAI化。<br/>忙しい経理マネージャーのためのAI活用実践ガイド。</p>
+      </div>
+    </section>
+
+    <section class="recommended-section">
+      <h2>まず読んでほしい記事</h2>
+      <div class="recommended-grid">
+        {recommended.map(r => (
+          <a href={`/deep-dive/${r.slug}/`} class="recommended-card">
+            <span class="recommended-title">{r.title}</span>
+            <span class="recommended-arrow">→</span>
+          </a>
+        ))}
+      </div>
+    </section>
+
+    <section class="articles-section">
+      <h2>深掘り解説（{deepDives.length}本）</h2>
+      <div class="articles-list">
+        {deepDives.map(article => (
+          <article class="article-card">
+            <time datetime={article.data.date}>{article.data.date}</time>
+            <h3><a href={`/deep-dive/${article.slug}/`}>{article.data.title}</a></h3>
+            <p>{article.data.summary.substring(0, 100)}...</p>
+          </article>
+        ))}
+      </div>
+    </section>
+
+    {tips.length > 0 && (
+      <section class="tips-section">
+        <h2>AI活用Tips</h2>
+        <div class="articles-list">
+          {tips.map(tip => (
+            <article class="article-card">
+              <time datetime={tip.data.date}>{tip.data.date}</time>
+              <h3><a href={`/tips/${tip.slug}/`}>{tip.data.title}</a></h3>
+            </article>
+          ))}
+        </div>
+        <a href="/tips" class="see-all-link">全てのTipsを見る →</a>
+      </section>
+    )}
+  </main>
+</BaseLayout>
+
+<style>
+  .persona-page { max-width: 900px; margin: 0 auto; padding: 0 1rem; }
+  .persona-hero { background: linear-gradient(135deg, #0d47a1, #1565c0); color: white; padding: 3rem 2rem; border-radius: 12px; margin: 2rem 0; }
+  .persona-hero-inner { max-width: 700px; }
+  .persona-badge { background: rgba(255,255,255,0.2); padding: 0.25rem 0.75rem; border-radius: 20px; font-size: 0.85rem; }
+  .persona-hero h1 { font-size: 2rem; margin: 1rem 0 0.5rem; }
+  .persona-hero p { opacity: 0.9; line-height: 1.8; }
+  .recommended-section { margin: 2rem 0; }
+  .recommended-section h2 { font-size: 1.3rem; margin-bottom: 1rem; }
+  .recommended-grid { display: grid; gap: 0.75rem; }
+  .recommended-card { display: flex; justify-content: space-between; align-items: center; padding: 1rem 1.25rem; background: var(--color-surface-variant, #f4f6f9); border: 2px solid var(--color-outline, #d1d5db); border-radius: 8px; text-decoration: none; color: inherit; transition: transform 0.15s; }
+  .recommended-card:hover { transform: translateX(4px); border-color: var(--color-primary, #0066cc); }
+  .recommended-title { font-weight: 600; }
+  .recommended-arrow { font-size: 1.2rem; color: var(--color-primary, #0066cc); }
+  .articles-section, .tips-section { margin: 3rem 0; }
+  .articles-section h2, .tips-section h2 { font-size: 1.3rem; margin-bottom: 1rem; border-bottom: 2px solid var(--color-outline, #d1d5db); padding-bottom: 0.5rem; }
+  .articles-list { display: grid; gap: 1rem; }
+  .article-card { padding: 1rem; border: 1px solid var(--color-outline, #e5e7eb); border-radius: 8px; }
+  .article-card time { font-size: 0.8rem; color: var(--color-on-surface-variant, #6b7280); }
+  .article-card h3 { font-size: 1rem; margin: 0.25rem 0; }
+  .article-card h3 a { text-decoration: none; color: inherit; }
+  .article-card h3 a:hover { color: var(--color-primary, #0066cc); }
+  .article-card p { font-size: 0.85rem; color: var(--color-on-surface-variant, #6b7280); margin: 0.25rem 0 0; }
+  .see-all-link { display: inline-block; margin-top: 1rem; color: var(--color-primary, #0066cc); text-decoration: none; font-weight: 600; }
+</style>

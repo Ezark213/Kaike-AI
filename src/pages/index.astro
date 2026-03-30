@@ -1,0 +1,1154 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro'
+import NewsletterCTA from '../components/NewsletterCTA.astro'
+import { getCollection } from 'astro:content'
+import { filterPublished } from '../lib/date-filter'
+import { SUPERVISOR_LABEL } from '../constants/site'
+import AdUnit from '../components/AdUnit.astro'
+
+const allArticles = filterPublished(await getCollection('daily'))
+const articles = allArticles
+  .sort((a, b) => new Date(b.data.date).getTime() - new Date(a.data.date).getTime())
+  .slice(0, 10)
+
+const allWeekly = filterPublished(await getCollection('weekly'))
+const weeklyArticles = allWeekly
+  .sort((a, b) => new Date(b.data.date).getTime() - new Date(a.data.date).getTime())
+  .slice(0, 3)
+
+const latestTips = filterPublished(await getCollection('tips'))
+const tips = latestTips
+  .sort((a, b) => new Date(b.data.date).getTime() - new Date(a.data.date).getTime())
+  .slice(0, 2)
+
+const todayArticle = articles[0]
+
+// ペルソナ別: タグで最も関連する記事を取得
+const keiriArticle = allArticles
+  .filter(a => a.data.tags.some(t => ['経理DX','仕訳','経費精算','資金繰り','給与計算','業務効率化'].includes(t)))
+  .sort((a, b) => new Date(b.data.date).getTime() - new Date(a.data.date).getTime())[0]
+
+const kaikeiShiArticle = allArticles
+  .filter(a => a.data.tags.some(t => ['監査','IFRS','内部統制','会計士キャリア','Big4'].includes(t)))
+  .sort((a, b) => new Date(b.data.date).getTime() - new Date(a.data.date).getTime())[0]
+
+const zeirishiArticle = allArticles
+  .filter(a => a.data.tags.some(t => ['税務','税理士DX','節税','税務調査','インボイス'].includes(t)))
+  .sort((a, b) => new Date(b.data.date).getTime() - new Date(a.data.date).getTime())[0]
+
+const cfoArticle = allArticles
+  .filter(a => a.data.tags.some(t => ['CFO','経営分析','M&A','財務予測','KPI','ESG'].includes(t)))
+  .sort((a, b) => new Date(b.data.date).getTime() - new Date(a.data.date).getTime())[0]
+
+// P3初心者向け: 入門系・基礎系記事を取得
+const beginnerArticles = allArticles
+  .filter(a => a.data.tags.some(t => ['業務効率化','経理DX','AI基礎','ChatGPT','freee','会計ソフト'].includes(t)))
+  .sort((a, b) => new Date(b.data.date).getTime() - new Date(a.data.date).getTime())
+  .slice(0, 3)
+
+// WebSite JSON-LD構造化データ（トップページ用）
+const websiteSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'WebSite',
+  name: 'Kaikei AI Daily',
+  url: 'https://kaikei-ai.jp',
+  description: 'AI会計ソフトの比較・レビュー、ChatGPT×経理の実践ガイド、AI監査・税務の最新ニュースを毎日配信。freee・マネーフォワード・弥生のAI機能をCPA試験合格者が徹底解説。',
+  inLanguage: 'ja',
+  publisher: {
+    '@type': 'Organization',
+    name: 'Kaikei AI Daily',
+    url: 'https://kaikei-ai.jp',
+    logo: {
+      '@type': 'ImageObject',
+      url: 'https://kaikei-ai.jp/favicon.svg',
+    },
+  },
+  potentialAction: {
+    '@type': 'SearchAction',
+    target: {
+      '@type': 'EntryPoint',
+      urlTemplate: 'https://kaikei-ai.jp/search?q={search_term_string}',
+    },
+    'query-input': 'required name=search_term_string',
+  },
+}
+---
+
+<BaseLayout title="AI会計ソフト比較・ChatGPT経理活用ガイド" structuredData={websiteSchema}>
+
+  <!-- Hero: 経理マネージャー/CFO向け -- 毎朝5分ポジショニング -->
+  <section class="hero">
+    <div class="hero-eyebrow">
+      <span class="hero-badge">
+        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M20 13c0 5-3.5 7.5-8 8.5-4.5-1-8-3.5-8-8.5V6l8-3 8 3z"/>
+          <polyline points="9 12 11 14 15 10"/>
+        </svg>
+        {SUPERVISOR_LABEL}
+      </span>
+      <span class="hero-badge hero-badge--auto">
+        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M4 11a9 9 0 0 1 9 9"/><path d="M4 4a16 16 0 0 1 16 16"/><circle cx="5" cy="19" r="1"/>
+        </svg>
+        毎朝5:30 自動更新
+      </span>
+    </div>
+    <h1>
+      忙しい経理・会計プロのための<br class="hero-br" />
+      <em>AI会計ニュース</em>、毎朝配信
+    </h1>
+    <p class="hero-sub">
+      経理マネージャー・公認会計士・税理士スタッフ向け。<br />
+      AIによる自動収集・要約をベースに、CPA試験合格者が監修。実務に効くニュースだけをお届けします。
+    </p>
+    <div class="hero-cta">
+      <a href="#latest" class="btn btn-primary">今日のニュースを見る</a>
+      <a href="https://x.com/KaikeiAI_Lab" target="_blank" rel="noopener" class="btn btn-outline">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.744l7.73-8.835L1.254 2.25H8.08l4.253 5.622zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+        X でフォロー
+      </a>
+    </div>
+    <div class="hero-stats" aria-label="サービス実績">
+      <div class="stat"><strong>180+</strong><span>公開記事</span></div>
+      <div class="stat-sep" aria-hidden="true">·</div>
+      <div class="stat"><strong>毎朝</strong><span>5:30更新</span></div>
+      <div class="stat-sep" aria-hidden="true">·</div>
+      <div class="stat"><strong>全記事</strong><span>無料</span></div>
+    </div>
+  </section>
+
+  <!-- Newsletter CTA: TOP PRIORITY -- 毎週のAI会計ニュースまとめ -->
+  <NewsletterCTA variant="full" />
+
+  <!-- ペルソナ別ナビ: 役割に合った情報へ誘導 (NEW) -->
+  <section class="persona-nav" aria-label="役割別コンテンツガイド">
+    <h2 class="persona-nav-title">あなたの役割に合った情報を</h2>
+    <div class="persona-grid">
+      <a href={keiriArticle ? `/daily/${keiriArticle.slug}` : '/'} class="persona-card">
+        <div class="persona-icon" aria-hidden="true"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 20V10"/><path d="M12 20V4"/><path d="M6 20v-6"/></svg></div>
+        <h3>経理・財務担当</h3>
+        <p>AI仕訳・自動化ツールの<br />実務導入情報</p>
+        <span class="persona-arrow" aria-hidden="true">→</span>
+      </a>
+      <a href={kaikeiShiArticle ? `/daily/${kaikeiShiArticle.slug}` : '/'} class="persona-card persona-card--highlighted">
+        <div class="persona-icon" aria-hidden="true"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="9" width="18" height="11"/><polyline points="3 9 12 2 21 9"/><line x1="3" y1="22" x2="21" y2="22"/><line x1="9" y1="22" x2="9" y2="13"/><line x1="15" y1="22" x2="15" y2="13"/></svg></div>
+        <h3>公認会計士・監査法人</h3>
+        <p>AI監査・DX動向・<br />キャリア差別化ヒント</p>
+        <span class="persona-arrow" aria-hidden="true">→</span>
+      </a>
+      <a href={zeirishiArticle ? `/daily/${zeirishiArticle.slug}` : '/'} class="persona-card">
+        <div class="persona-icon" aria-hidden="true"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg></div>
+        <h3>税理士・税務スタッフ</h3>
+        <p>税務AI・顧客提案に使える<br />最新ネタ収集</p>
+        <span class="persona-arrow" aria-hidden="true">→</span>
+      </a>
+      <a href={cfoArticle ? `/daily/${cfoArticle.slug}` : '/'} class="persona-card">
+        <div class="persona-icon" aria-hidden="true"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg></div>
+        <h3>経営企画・CFO</h3>
+        <p>AI投資判断・競合動向・<br />戦略的インサイト</p>
+        <span class="persona-arrow" aria-hidden="true">→</span>
+      </a>
+    </div>
+  </section>
+
+  <!-- P3: はじめての方ガイド -- 若手税務スタッフ・初学者向け -->
+  <section class="beginner-guide" aria-label="はじめての方へ">
+    <div class="beginner-header">
+      <h2>
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/>
+        </svg>
+        はじめての方へ
+      </h2>
+      <p>会計×AIの世界へようこそ。まずはここから始めましょう。</p>
+    </div>
+    <div class="beginner-steps">
+      <div class="beginner-step">
+        <span class="step-number">1</span>
+        <div class="step-content">
+          <h3>毎朝チェック</h3>
+          <p>このサイトは毎朝5:30に最新のAI×会計ニュースを自動配信。通勤中にスマホで3分読むだけで業界動向がわかります。</p>
+        </div>
+      </div>
+      <div class="beginner-step">
+        <span class="step-number">2</span>
+        <div class="step-content">
+          <h3>ツールを試す</h3>
+          <p>freee会計やマネーフォワードなどのAI会計ソフトは無料トライアルで体験可能。まずは仕訳入力の自動化から始めましょう。</p>
+        </div>
+      </div>
+      <div class="beginner-step">
+        <span class="step-number">3</span>
+        <div class="step-content">
+          <h3>スキルアップ</h3>
+          <p>AI活用Tipsで実務に使えるプロンプトを学び、BOOTHのテンプレートで効率化を加速させましょう。</p>
+        </div>
+      </div>
+    </div>
+    {beginnerArticles.length > 0 && (
+      <div class="beginner-articles">
+        <h3 class="beginner-articles-title">初心者におすすめの記事</h3>
+        <div class="beginner-articles-list">
+          {beginnerArticles.map((article) => (
+            <a href={`/daily/${article.slug}`} class="beginner-article-link">
+              <time>{article.data.date}</time>
+              <span>{article.data.title}</span>
+            </a>
+          ))}
+        </div>
+      </div>
+    )}
+  </section>
+
+  <!-- 今日のトップニュース: CFO・経理マネ向けハイライト (NEW) -->
+  {todayArticle && (
+    <section class="today-highlight" aria-label="最新トップ記事">
+      <div class="today-header">
+        <div class="today-labels">
+          <span class="today-badge">
+            <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M4 11a9 9 0 0 1 9 9"/><path d="M4 4a16 16 0 0 1 16 16"/><circle cx="5" cy="19" r="1"/>
+            </svg>
+            最新
+          </span>
+          <span class="cpa-badge">
+            <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M20 13c0 5-3.5 7.5-8 8.5-4.5-1-8-3.5-8-8.5V6l8-3 8 3z"/>
+              <polyline points="9 12 11 14 15 10"/>
+            </svg>
+            {SUPERVISOR_LABEL}
+          </span>
+        </div>
+        <time class="today-date">{todayArticle.data.date}</time>
+      </div>
+      <h2 class="today-title">
+        <a href={`/daily/${todayArticle.slug}`}>{todayArticle.data.title}</a>
+      </h2>
+      <p class="today-summary">{todayArticle.data.summary}</p>
+      <div class="today-footer">
+        <div class="today-tags">
+          {todayArticle.data.tags.slice(0, 3).map((tag) => (
+            <span class="tag">{tag}</span>
+          ))}
+        </div>
+        <a href={`/daily/${todayArticle.slug}`} class="btn btn-primary">
+          全文を読む
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="9 18 15 12 9 6"/></svg>
+        </a>
+      </div>
+    </section>
+  )}
+
+  <!-- アフィリエイト: 経理ソフト推薦 -- ペルソナターゲット (NEW) -->
+  <aside class="affiliate-strip" aria-label="おすすめ経理ソフト（広告）">
+    <p class="affiliate-label">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
+      </svg>
+      AIで経理を効率化するならこちら（広告）
+    </p>
+    <div class="affiliate-links">
+      <a href="https://px.a8.net/svt/ejp?a8mat=4AZ8K2+FBBEYA+3SPO+9FL80Y" target="_blank" rel="noopener sponsored" class="affiliate-btn affiliate-btn--primary">
+        freee会計 — 無料で試す
+      </a>
+      <a href="https://px.a8.net/svt/ejp?a8mat=4AZ8K2+F5D2WI+4JGQ+60WN6" target="_blank" rel="noopener sponsored" class="affiliate-btn">
+        マネーフォワード クラウド会計
+      </a>
+      <a href="https://px.a8.net/svt/ejp?a8mat=4AZ8K2+FCIA5U+4JGQ+BZ8OY" target="_blank" rel="noopener sponsored" class="affiliate-btn">
+        MF 確定申告
+      </a>
+      <a href="https://px.a8.net/svt/ejp?a8mat=4AZ9C6+FBWUK2+48D0+6A4FM" target="_blank" rel="noopener sponsored" class="affiliate-btn">
+        FXTF — 狭スプレッドFX取引
+      </a>
+    </div>
+  </aside>
+
+  <!-- Latest articles -->
+  <section id="latest" class="latest-section">
+    <div class="section-header">
+      <h2>
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M4 11a9 9 0 0 1 9 9"/><path d="M4 4a16 16 0 0 1 16 16"/><circle cx="5" cy="19" r="1"/>
+        </svg>
+        ニュース一覧
+      </h2>
+      <span class="section-sub">毎朝自動収集 × {SUPERVISOR_LABEL}</span>
+    </div>
+    <div class="article-list">
+      {articles.map((article, index) => (
+        <>
+          {/* フィード内広告: 5記事目の後に挿入 */}
+          {index === 5 && <AdUnit name="feedInline" />}
+          <article class="article-card">
+            <div class="article-meta">
+              <time class="article-date">{article.data.date}</time>
+              <span class="cpa-badge">
+                <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <path d="M20 13c0 5-3.5 7.5-8 8.5-4.5-1-8-3.5-8-8.5V6l8-3 8 3z"/>
+                  <polyline points="9 12 11 14 15 10"/>
+                </svg>
+                {SUPERVISOR_LABEL}
+              </span>
+              <span class="read-time">約3分</span>
+            </div>
+            <h3 class="article-title">
+              <a href={`/daily/${article.slug}`}>{article.data.title}</a>
+            </h3>
+            <p class="article-summary">{article.data.summary}</p>
+            <div class="article-footer">
+              <div class="article-tags">
+                {article.data.tags.slice(0, 3).map((tag) => (
+                  <span class="tag">{tag}</span>
+                ))}
+              </div>
+              <a href={`/daily/${article.slug}`} class="read-more" aria-label={`${article.data.title}を読む`}>
+                続きを読む
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <polyline points="9 18 15 12 9 6"/>
+                </svg>
+              </a>
+            </div>
+          </article>
+        </>
+      ))}
+    </div>
+  </section>
+
+  <!-- 広告: 週刊セクション上ディスプレイ広告 -->
+  <AdUnit name="homepageDisplay" />
+
+  <!-- 週刊ダイジェスト: SEO資産化コンテンツ -->
+  {weeklyArticles.length > 0 && (
+    <section class="weekly-section">
+      <div class="section-header">
+        <h2>
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+          週刊AI会計ダイジェスト
+        </h2>
+        <span class="section-sub">毎週月曜更新</span>
+      </div>
+      <div class="weekly-grid">
+        {weeklyArticles.map((article) => (
+          <article class="weekly-card">
+            <time class="weekly-date">{article.data.weekStart} 〜 {article.data.weekEnd}</time>
+            <h3 class="weekly-title">
+              <a href={`/weekly/${article.slug}`}>{article.data.title}</a>
+            </h3>
+            <p class="weekly-summary">{article.data.summary}</p>
+          </article>
+        ))}
+      </div>
+      <div class="weekly-footer">
+        <a href="/weekly" class="btn btn-outline">全てのダイジェストを見る</a>
+      </div>
+    </section>
+  )}
+
+  <!-- AI活用Tips: 若手会計士・税理士スタッフ向け -->
+  {tips.length > 0 && (
+    <section class="tips-section">
+      <div class="section-header">
+        <h2>
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
+          </svg>
+          AI活用Tips
+        </h2>
+        <span class="section-sub">若手会計士・税理士スタッフ向け</span>
+      </div>
+      <div class="tips-grid">
+        {tips.map((tip) => (
+          <article class="tip-card">
+            <time class="tip-date">{tip.data.date}</time>
+            <h3 class="tip-title">
+              <a href={`/tips/${tip.slug}`}>{tip.data.title}</a>
+            </h3>
+            <p class="tip-summary">{tip.data.summary}</p>
+            {tip.data.tool && (
+              <span class="tool-badge">{tip.data.tool}</span>
+            )}
+          </article>
+        ))}
+      </div>
+      <div class="tips-footer">
+        <a href="/tips" class="btn btn-outline">全てのTipsを見る</a>
+        <a href="https://ezark-devtools.booth.pm/" target="_blank" rel="noopener" class="btn btn-outline">
+          経理AIプロンプト集 (BOOTH)
+        </a>
+      </div>
+    </section>
+  )}
+
+  <!-- CTA: ペルソナ別に分けた訴求 -->
+  <section class="cta-section" aria-labelledby="cta-heading">
+    <div class="cta-inner">
+      <h2 id="cta-heading">会計×AIを武器にする</h2>
+      <p>
+        毎朝7時にX(@KaikeiAI_Lab)でニュース速報配信中。<br />
+        実務で使えるAIプロンプト集はBOOTHで配布中（無料サンプルあり）。
+      </p>
+      <div class="cta-links">
+        <a href="https://x.com/KaikeiAI_Lab" target="_blank" rel="noopener" class="btn btn-primary">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.744l7.73-8.835L1.254 2.25H8.08l4.253 5.622zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+          X でフォロー
+        </a>
+        <a href="https://ezark-devtools.booth.pm/" target="_blank" rel="noopener" class="btn btn-outline">
+          AIプロンプト集 (BOOTH)
+        </a>
+        <a href="https://note.com/ezark_company" target="_blank" rel="noopener" class="btn btn-outline">
+          週刊レポート (note)
+        </a>
+      </div>
+    </div>
+  </section>
+
+</BaseLayout>
+
+<style>
+  /* ==========================================
+     Hero -- 経理プロ向けポジショニング
+  ========================================== */
+  .hero {
+    text-align: center;
+    padding: 3rem 0 2.5rem;
+  }
+
+  .hero-eyebrow {
+    display: flex;
+    gap: 0.5rem;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-bottom: 1.25rem;
+  }
+
+  .hero-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    background: var(--color-accent);
+    color: white;
+    font-size: 0.6875rem;
+    font-weight: 700;
+    padding: 0.275rem 0.625rem;
+    letter-spacing: 0.04em;
+    border: 3px solid var(--color-outline);
+    box-shadow: 2px 2px 0 var(--color-shadow);
+  }
+
+  .hero-badge--auto {
+    background: var(--color-primary);
+  }
+
+  .hero h1 {
+    font-size: clamp(1.625rem, 4.5vw, 2.5rem);
+    font-weight: 800;
+    letter-spacing: -0.025em;
+    margin-bottom: 1rem;
+    color: var(--color-on-surface);
+    line-height: 1.35;
+  }
+
+  .hero h1 em {
+    font-style: normal;
+    color: var(--color-primary);
+    text-decoration: underline;
+    text-decoration-thickness: 3px;
+    text-underline-offset: 4px;
+  }
+
+  .hero-br { display: block; }
+
+  .hero-sub {
+    font-size: 1rem;
+    color: var(--color-on-surface-variant);
+    max-width: 520px;
+    margin: 0 auto 1.75rem;
+    line-height: 1.75;
+  }
+
+  .hero-cta {
+    display: flex;
+    gap: 0.75rem;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-bottom: 1.5rem;
+  }
+
+  .hero-stats {
+    display: inline-flex;
+    align-items: center;
+    gap: 1rem;
+    font-size: 0.8125rem;
+    color: var(--color-on-surface-variant);
+    border: 3px solid var(--color-outline);
+    box-shadow: 3px 3px 0 var(--color-shadow);
+    padding: 0.4rem 1.25rem;
+    background: var(--color-surface);
+  }
+
+  .stat { display: flex; align-items: center; gap: 0.3rem; }
+  .stat strong { font-size: 1rem; font-weight: 700; color: var(--color-on-surface); }
+  .stat span { font-size: 0.6875rem; }
+  .stat-sep { color: var(--color-border); font-size: 1.2rem; }
+
+  /* ==========================================
+     Buttons -- Neo-Brutalism準拠
+  ========================================== */
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.625rem 1.25rem;
+    font-size: 0.875rem;
+    font-weight: 700;
+    text-decoration: none;
+    border: 3px solid var(--color-outline);
+    box-shadow: 4px 4px 0 var(--color-outline);
+    transition: transform 0.15s, box-shadow 0.15s;
+    cursor: pointer;
+    min-height: 44px;
+  }
+
+  .btn-primary {
+    background: var(--color-primary);
+    color: var(--color-on-primary);
+  }
+
+  .btn-outline {
+    background: var(--color-surface);
+    color: var(--color-on-surface);
+  }
+
+  .btn:hover {
+    transform: translate(-3px, -3px);
+    box-shadow: 7px 7px 0 var(--color-outline);
+  }
+
+  .btn:focus-visible {
+    outline: 3px solid var(--color-primary);
+    outline-offset: 2px;
+  }
+
+  /* ==========================================
+     ペルソナナビ (NEW)
+  ========================================== */
+  .persona-nav {
+    padding: 2.5rem 0 2rem;
+    border-top: 3px solid var(--color-outline);
+    margin-top: 2rem;
+  }
+
+  .persona-nav-title {
+    font-size: 1rem;
+    font-weight: 700;
+    text-align: center;
+    margin-bottom: 1.25rem;
+    color: var(--color-on-surface-variant);
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    font-size: 0.8125rem;
+  }
+
+  .persona-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0.875rem;
+  }
+
+  .persona-card {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+    padding: 1.125rem 1rem;
+    background: var(--color-surface);
+    border: 3px solid var(--color-outline);
+    box-shadow: 5px 5px 0 var(--color-shadow);
+    text-decoration: none;
+    color: var(--color-on-surface);
+    transition: transform 0.15s, box-shadow 0.15s;
+  }
+
+  .persona-card:hover {
+    transform: translate(-3px, -3px);
+    box-shadow: 8px 8px 0 var(--color-shadow);
+  }
+
+  .persona-card--highlighted {
+    background: var(--color-primary);
+    color: var(--color-on-primary);
+    border-color: var(--color-outline);
+  }
+
+  .persona-card--highlighted h3,
+  .persona-card--highlighted p {
+    color: var(--color-on-primary);
+  }
+
+  .persona-icon { display: flex; align-items: center; justify-content: center; width: 2.5rem; height: 2.5rem; background: var(--color-primary); color: white; margin-bottom: 0.625rem; flex-shrink: 0; }
+
+  .persona-card h3 {
+    font-size: 0.875rem;
+    font-weight: 700;
+    margin: 0;
+  }
+
+  .persona-card p {
+    font-size: 0.75rem;
+    color: var(--color-on-surface-variant);
+    line-height: 1.5;
+    flex: 1;
+    margin: 0;
+  }
+
+  .persona-arrow {
+    font-size: 0.875rem;
+    font-weight: 700;
+    margin-top: 0.5rem;
+    opacity: 0.7;
+  }
+
+  /* ==========================================
+     今日のハイライト (NEW)
+  ========================================== */
+  .today-highlight {
+    background: var(--color-surface);
+    border: 4px solid var(--color-outline);
+    box-shadow: 8px 8px 0 var(--color-shadow);
+    padding: 1.5rem;
+    margin: 2rem 0;
+  }
+
+  .today-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 0.75rem;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  .today-labels {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .today-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    background: var(--color-primary);
+    color: white;
+    font-size: 0.625rem;
+    font-weight: 700;
+    padding: 0.2rem 0.5rem;
+    letter-spacing: 0.04em;
+  }
+
+  .cpa-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    font-size: 0.625rem;
+    font-weight: 700;
+    padding: 0.2rem 0.45rem;
+    background: var(--color-accent);
+    color: white;
+    letter-spacing: 0.03em;
+  }
+
+  .today-date {
+    font-size: 0.75rem;
+    color: var(--color-on-surface-variant);
+    font-family: var(--font-mono);
+  }
+
+  .today-title {
+    font-size: 1.375rem;
+    font-weight: 800;
+    margin-bottom: 0.75rem;
+    line-height: 1.4;
+  }
+
+  .today-title a {
+    color: var(--color-on-surface);
+    text-decoration: none;
+  }
+
+  .today-title a:hover { color: var(--color-primary); }
+
+  .today-summary {
+    font-size: 0.9375rem;
+    color: var(--color-on-surface-variant);
+    line-height: 1.7;
+    margin-bottom: 1rem;
+  }
+
+  .today-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+  }
+
+  .today-tags { display: flex; gap: 0.375rem; flex-wrap: wrap; }
+
+  /* ==========================================
+     アフィリエイト バナー (NEW)
+  ========================================== */
+  .affiliate-strip {
+    background: var(--color-surface-variant);
+    border: 3px solid var(--color-outline);
+    box-shadow: 4px 4px 0 var(--color-shadow);
+    padding: 0.875rem 1.25rem;
+    margin-bottom: 2rem;
+  }
+
+  .affiliate-label {
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+    font-size: 0.6875rem;
+    font-weight: 600;
+    color: var(--color-on-surface-variant);
+    margin-bottom: 0.625rem;
+  }
+
+  .affiliate-links {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+    align-items: center;
+  }
+
+  .affiliate-btn {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.375rem 0.875rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-decoration: none;
+    border: 3px solid var(--color-outline);
+    box-shadow: 3px 3px 0 var(--color-shadow);
+    background: var(--color-surface);
+    color: var(--color-on-surface);
+    transition: transform 0.15s, box-shadow 0.15s, background 0.15s;
+    min-height: 44px;
+  }
+
+  .affiliate-btn--primary {
+    background: var(--color-primary);
+    color: white;
+    border-color: var(--color-outline);
+  }
+
+  .affiliate-btn:hover {
+    transform: translate(-2px, -2px);
+    box-shadow: 5px 5px 0 var(--color-shadow);
+    color: var(--color-primary);
+  }
+
+  .affiliate-btn--primary:hover {
+    background: var(--color-primary-hover);
+    color: white;
+  }
+
+  /* ==========================================
+     Section header
+  ========================================== */
+  .section-header {
+    display: flex;
+    align-items: baseline;
+    gap: 0.75rem;
+    margin-bottom: 1.125rem;
+    border-bottom: 3px solid var(--color-outline);
+    padding-bottom: 0.5rem;
+  }
+
+  .section-header h2 {
+    font-size: 1.125rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    margin: 0;
+  }
+
+  .section-sub {
+    font-size: 0.75rem;
+    color: var(--color-on-surface-variant);
+    font-weight: 500;
+  }
+
+  /* ==========================================
+     Article list
+  ========================================== */
+  .latest-section { padding: 0 0 2rem; }
+
+  .article-list { display: flex; flex-direction: column; gap: 1rem; }
+
+  .article-card {
+    background: var(--color-surface);
+    border: 4px solid var(--color-outline);
+    box-shadow: 6px 6px 0 var(--color-shadow);
+    padding: 1.25rem;
+    transition: transform 0.15s, box-shadow 0.15s;
+  }
+
+  .article-card:hover {
+    transform: translate(-3px, -3px);
+    box-shadow: 9px 9px 0 var(--color-shadow);
+  }
+
+  .article-meta {
+    display: flex;
+    align-items: center;
+    gap: 0.625rem;
+    margin-bottom: 0.4rem;
+    flex-wrap: wrap;
+  }
+
+  .article-date {
+    font-size: 0.75rem;
+    color: var(--color-on-surface-variant);
+    font-family: var(--font-mono);
+  }
+
+  .read-time {
+    font-size: 0.625rem;
+    color: var(--color-on-surface-variant);
+    padding: 0.1rem 0.375rem;
+    background: var(--color-surface-variant);
+    border: 1px solid var(--color-border);
+  }
+
+  .article-title {
+    font-size: 1.0625rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+    line-height: 1.45;
+  }
+
+  .article-title a {
+    color: var(--color-on-surface);
+    text-decoration: none;
+  }
+
+  .article-title a:hover { color: var(--color-primary); }
+
+  .article-summary {
+    font-size: 0.875rem;
+    color: var(--color-on-surface-variant);
+    line-height: 1.65;
+    margin-bottom: 0.75rem;
+  }
+
+  .article-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+  }
+
+  .article-tags { display: flex; gap: 0.35rem; flex-wrap: wrap; }
+
+  .tag {
+    font-size: 0.6875rem;
+    padding: 0.125rem 0.45rem;
+    background: var(--color-surface-variant);
+    border: 1px solid var(--color-border);
+    color: var(--color-on-surface-variant);
+    font-weight: 500;
+  }
+
+  .read-more {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.2rem;
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: var(--color-primary);
+    text-decoration: none;
+    white-space: nowrap;
+  }
+
+  .read-more:hover { text-decoration: underline; }
+
+  /* ==========================================
+     Weekly section
+  ========================================== */
+  .weekly-section { padding: 0 0 2rem; }
+
+  .weekly-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+    margin-bottom: 1rem;
+  }
+
+  .weekly-card {
+    background: var(--color-surface);
+    border: 4px solid var(--color-outline);
+    box-shadow: 6px 6px 0 var(--color-shadow);
+    padding: 1.125rem;
+    transition: transform 0.15s, box-shadow 0.15s;
+  }
+
+  .weekly-card:hover {
+    transform: translate(-3px, -3px);
+    box-shadow: 9px 9px 0 var(--color-shadow);
+  }
+
+  .weekly-date {
+    display: block;
+    font-size: 0.6875rem;
+    color: var(--color-on-surface-variant);
+    font-family: var(--font-mono);
+    margin-bottom: 0.375rem;
+  }
+
+  .weekly-title { font-size: 0.9375rem; font-weight: 700; margin-bottom: 0.375rem; }
+  .weekly-title a { color: var(--color-on-surface); text-decoration: none; }
+  .weekly-title a:hover { color: var(--color-primary); }
+
+  .weekly-summary { font-size: 0.8125rem; color: var(--color-on-surface-variant); line-height: 1.6; }
+
+  .weekly-footer {
+    display: flex;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+    padding: 0.5rem 0;
+  }
+
+  /* ==========================================
+     Tips section
+  ========================================== */
+  .tips-section { padding: 0 0 2rem; }
+
+  .tips-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+    margin-bottom: 1rem;
+  }
+
+  .tip-card {
+    background: var(--color-surface);
+    border: 4px solid var(--color-outline);
+    box-shadow: 6px 6px 0 var(--color-shadow);
+    padding: 1.125rem;
+    transition: transform 0.15s, box-shadow 0.15s;
+  }
+
+  .tip-card:hover {
+    transform: translate(-3px, -3px);
+    box-shadow: 9px 9px 0 var(--color-shadow);
+  }
+
+  .tip-date {
+    display: block;
+    font-size: 0.6875rem;
+    color: var(--color-on-surface-variant);
+    font-family: var(--font-mono);
+    margin-bottom: 0.375rem;
+  }
+
+  .tip-title { font-size: 0.9375rem; font-weight: 700; margin-bottom: 0.375rem; }
+  .tip-title a { color: var(--color-on-surface); text-decoration: none; }
+  .tip-title a:hover { color: var(--color-primary); }
+
+  .tip-summary { font-size: 0.8125rem; color: var(--color-on-surface-variant); line-height: 1.6; }
+
+  .tool-badge {
+    display: inline-block;
+    margin-top: 0.5rem;
+    font-size: 0.625rem;
+    font-weight: 700;
+    background: var(--color-on-surface);
+    color: var(--color-on-primary);
+    padding: 0.15rem 0.4rem;
+    letter-spacing: 0.03em;
+  }
+
+  .tips-footer {
+    display: flex;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+    padding: 0.5rem 0;
+  }
+
+  /* ==========================================
+     CTA section
+  ========================================== */
+  .cta-section {
+    border-top: 3px solid var(--color-outline);
+    padding: 2.5rem 0;
+    margin-top: 2rem;
+  }
+
+  .cta-inner { text-align: center; }
+
+  .cta-section h2 { font-size: 1.375rem; font-weight: 800; margin-bottom: 0.625rem; }
+
+  .cta-section p {
+    font-size: 0.9375rem;
+    color: var(--color-on-surface-variant);
+    margin-bottom: 1.5rem;
+    line-height: 1.7;
+  }
+
+  .cta-links { display: flex; gap: 0.75rem; justify-content: center; flex-wrap: wrap; }
+
+  /* ==========================================
+     Beginner Guide (P3)
+  ========================================== */
+  .beginner-guide {
+    padding: 2rem;
+    margin-bottom: 2rem;
+    background: var(--color-surface);
+    border: 3px solid var(--color-outline);
+    box-shadow: 6px 6px 0 var(--color-shadow);
+  }
+
+  .beginner-header {
+    margin-bottom: 1.5rem;
+  }
+
+  .beginner-header h2 {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 1.25rem;
+    font-weight: 800;
+    margin: 0 0 0.5rem;
+    color: var(--color-on-surface);
+  }
+
+  .beginner-header p {
+    font-size: 0.9rem;
+    color: var(--color-on-surface-variant);
+    margin: 0;
+  }
+
+  .beginner-steps {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .beginner-step {
+    display: flex;
+    gap: 1rem;
+    align-items: flex-start;
+    padding: 1rem;
+    background: var(--color-surface-alt, #f8f9fb);
+    border: 2px solid var(--color-border);
+    border-left: 4px solid var(--color-primary);
+  }
+
+  .step-number {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    min-width: 28px;
+    background: var(--color-primary);
+    color: var(--color-on-primary, #fff);
+    font-size: 0.8rem;
+    font-weight: 800;
+    border-radius: 50%;
+  }
+
+  .step-content h3 {
+    font-size: 0.95rem;
+    font-weight: 700;
+    margin: 0 0 0.25rem;
+    color: var(--color-on-surface);
+  }
+
+  .step-content p {
+    font-size: 0.85rem;
+    color: var(--color-on-surface-variant);
+    margin: 0;
+    line-height: 1.6;
+  }
+
+  .beginner-articles {
+    border-top: 2px solid var(--color-border);
+    padding-top: 1rem;
+  }
+
+  .beginner-articles-title {
+    font-size: 0.9rem;
+    font-weight: 700;
+    margin: 0 0 0.75rem;
+    color: var(--color-on-surface);
+  }
+
+  .beginner-articles-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .beginner-article-link {
+    display: flex;
+    align-items: baseline;
+    gap: 0.75rem;
+    padding: 0.5rem 0.75rem;
+    text-decoration: none;
+    border: 2px solid var(--color-border);
+    transition: transform 0.15s, box-shadow 0.15s, border-color 0.15s;
+  }
+
+  .beginner-article-link:hover {
+    border-color: var(--color-primary);
+    transform: translate(-2px, -2px);
+    box-shadow: 3px 3px 0 var(--color-shadow);
+  }
+
+  .beginner-article-link time {
+    font-size: 0.75rem;
+    color: var(--color-on-surface-variant);
+    white-space: nowrap;
+    min-width: 5.5rem;
+  }
+
+  .beginner-article-link span {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--color-primary);
+    line-height: 1.4;
+  }
+
+  /* ==========================================
+     Responsive
+  ========================================== */
+  @media (max-width: 900px) {
+    .persona-grid { grid-template-columns: repeat(2, 1fr); }
+  }
+
+  @media (max-width: 640px) {
+    .hero-br { display: none; }
+    .hero-stats { gap: 0.625rem; padding: 0.375rem 0.875rem; }
+    .hero-cta { flex-direction: column; align-items: center; }
+    .persona-grid { grid-template-columns: 1fr 1fr; gap: 0.625rem; }
+    .persona-card { padding: 0.875rem 0.75rem; }
+    .today-footer { flex-direction: column; align-items: flex-start; }
+    .weekly-grid { grid-template-columns: 1fr; }
+    .tips-grid { grid-template-columns: 1fr; }
+    .article-footer { flex-direction: column; align-items: flex-start; }
+    .affiliate-links { flex-direction: column; }
+    .beginner-guide { padding: 1.25rem; }
+    .beginner-step { padding: 0.75rem; }
+    .beginner-article-link { flex-direction: column; gap: 0.25rem; }
+  }
+
+  @media (max-width: 400px) {
+    .persona-grid { grid-template-columns: 1fr; }
+  }
+</style>

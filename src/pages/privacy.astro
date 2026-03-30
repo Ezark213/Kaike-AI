@@ -1,0 +1,104 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro'
+---
+
+<BaseLayout title="プライバシーポリシー" description="Kaikei AI Dailyのプライバシーポリシー。個人情報の取り扱い、Cookie、アクセス解析について。">
+
+  <section class="privacy">
+    <h1>プライバシーポリシー</h1>
+    <p class="last-updated">最終更新日: 2026年3月7日</p>
+
+    <h2>1. 運営者情報</h2>
+    <p>本サイト「Kaikei AI Daily」（以下「当サイト」）は、イザークコンサルティング株式会社が運営しています。</p>
+
+    <h2>2. 個人情報の取得について</h2>
+    <p>当サイトでは、以下の場合に個人情報を取得することがあります。</p>
+    <ul>
+      <li>メールマガジンの登録時（メールアドレス）</li>
+      <li>お問い合わせ時（X DM等でのやり取り）</li>
+    </ul>
+    <p>取得した個人情報は、サービスの提供および改善のためにのみ利用し、本人の同意なく第三者に提供することはありません。</p>
+
+    <h2>3. アクセス解析ツールについて</h2>
+    <p>当サイトでは、Googleによるアクセス解析ツール「Google Analytics 4」を使用しています。</p>
+    <p>Google Analyticsは、トラフィックデータの収集のためにCookieを使用しています。このトラフィックデータは匿名で収集されており、個人を特定するものではありません。</p>
+    <p>この機能はCookieを無効にすることで収集を拒否できます。お使いのブラウザの設定をご確認ください。</p>
+    <p>Google Analyticsの利用規約については、<a href="https://marketingplatform.google.com/about/analytics/terms/jp/" target="_blank" rel="noopener">Google アナリティクス利用規約</a>をご確認ください。</p>
+
+    <h2>4. 広告配信について</h2>
+    <p>当サイトでは、第三者配信の広告サービス「Google AdSense」を利用しています。</p>
+    <p>Google AdSenseでは、ユーザーの興味に応じた商品やサービスの広告を表示するため、Cookieを使用することがあります。Cookieを使用することにより、ユーザーがそのサイトや他のサイトに過去にアクセスした際の情報に基づいて広告を配信します。</p>
+    <p>パーソナライズド広告は、<a href="https://www.google.com/settings/ads" target="_blank" rel="noopener">Google 広告設定</a>で無効にできます。</p>
+
+    <h2>5. アフィリエイトプログラムについて</h2>
+    <p>当サイトは、A8.netをはじめとするアフィリエイトプログラムに参加しています。</p>
+    <p>記事中にアフィリエイトリンクを含む場合は「PR」「広告」等の表記を付しています。アフィリエイトリンクを経由して商品・サービスをご購入いただくと、当サイトが紹介料を受け取る場合があります。</p>
+
+    <h2>6. Cookieの使用について</h2>
+    <p>当サイトでは、以下の目的でCookieを使用しています。</p>
+    <ul>
+      <li>アクセス解析（Google Analytics）</li>
+      <li>広告配信（Google AdSense）</li>
+      <li>アフィリエイト成果計測（A8.net）</li>
+    </ul>
+    <p>Cookieはブラウザの設定により無効化できます。ただし、一部の機能が正常に動作しなくなる場合があります。</p>
+
+    <h2>7. 免責事項</h2>
+    <p>当サイトの記事はAIによる自動収集・要約をベースに、CPA試験合格者が監修しています。情報の正確性には万全を期していますが、掲載情報の完全性・正確性・有用性を保証するものではありません。</p>
+    <p>具体的な会計・税務判断は、公認会計士・税理士にご相談ください。当サイトの情報を基に行った行為について、当サイトは一切の責任を負いかねます。</p>
+
+    <h2>8. 著作権について</h2>
+    <p>当サイトに掲載されている文章・画像等のコンテンツの著作権は、当サイト運営者に帰属します。無断転載・複製はお控えください。</p>
+    <p>引用する場合は、出典元として当サイト名およびURLを明記してください。</p>
+
+    <h2>9. プライバシーポリシーの変更</h2>
+    <p>当サイトは、必要に応じて本プライバシーポリシーを変更することがあります。変更後のプライバシーポリシーは、当ページに掲載した時点で効力を生じます。</p>
+
+    <h2>10. お問い合わせ</h2>
+    <p>プライバシーポリシーに関するお問い合わせは、X (<a href="https://x.com/kaikeiAI_Lab" target="_blank" rel="noopener">@kaikeiAI_Lab</a>) のDMからお気軽にどうぞ。</p>
+  </section>
+
+</BaseLayout>
+
+<style>
+  .privacy { max-width: 720px; }
+
+  .privacy h1 { font-size: 1.75rem; font-weight: 800; margin-bottom: 0.5rem; }
+
+  .last-updated {
+    font-size: 0.8125rem;
+    color: var(--color-on-surface-variant);
+    margin-bottom: 2rem;
+    font-family: var(--font-mono);
+  }
+
+  .privacy h2 {
+    font-size: 1.125rem;
+    font-weight: 700;
+    margin: 2rem 0 0.75rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 4px solid var(--color-outline);
+  }
+
+  .privacy p {
+    font-size: 0.9375rem;
+    line-height: 1.8;
+    margin-bottom: 0.75rem;
+    color: var(--color-on-surface);
+  }
+
+  .privacy ul {
+    margin: 0.5rem 0 1rem 1.5rem;
+    font-size: 0.9375rem;
+    line-height: 1.8;
+  }
+
+  .privacy li { margin-bottom: 0.25rem; }
+
+  .privacy a {
+    color: var(--color-primary);
+    text-decoration: none;
+    font-weight: 600;
+  }
+  .privacy a:hover { text-decoration: underline; }
+</style>

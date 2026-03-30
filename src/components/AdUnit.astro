@@ -1,0 +1,106 @@
+---
+/**
+ * Google AdSense 広告ユニットコンポーネント
+ *
+ * 使用例:
+ * <AdUnit name="articleTop" />
+ * <AdUnit name="articleMid" />
+ * <AdUnit name="feedInline" />
+ */
+import { AD_CLIENT, AD_SLOTS } from '../constants/ad-config'
+
+interface Props {
+  /** AD_SLOTS のキー名 */
+  name: keyof typeof AD_SLOTS
+  /** 追加CSSクラス */
+  class?: string
+}
+
+const { name, class: className = '' } = Astro.props
+const config = AD_SLOTS[name]
+
+// スロットIDが未設定の場合は何も表示しない
+const hasSlot = config.slot !== ''
+---
+
+{hasSlot && (
+  <aside class={`ad-unit ad-unit--${name} ${className}`} aria-label="広告" data-ad-name={name}>
+    <span class="ad-unit__label">広告</span>
+    <ins
+      class="adsbygoogle"
+      style={config.format === 'fluid'
+        ? 'display:block; text-align:center;'
+        : 'display:block;'}
+      data-ad-client={AD_CLIENT}
+      data-ad-slot={config.slot}
+      data-ad-format={config.format}
+      {...(('responsive' in config && config.responsive) ? { 'data-full-width-responsive': 'true' } : {})}
+      {...(('layout' in config && config.layout) ? { 'data-ad-layout': config.layout } : {})}
+      {...(('layoutKey' in config && config.layoutKey) ? { 'data-ad-layout-key': config.layoutKey } : {})}
+    />
+    <script is:inline>
+      (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>
+  </aside>
+)}
+
+<style>
+  .ad-unit {
+    position: relative;
+    margin: 1.5rem 0;
+    padding: 0.75rem;
+    background: var(--color-surface-variant);
+    border: 1px solid var(--color-border);
+    max-width: 728px;
+    overflow: hidden;
+  }
+
+  /* CLS対策: 各フォーマットの最小高さを事前確保 */
+  .ad-unit--articleTop,
+  .ad-unit--articleBottom,
+  .ad-unit--homepageDisplay {
+    min-height: 100px;
+  }
+
+  .ad-unit--articleMid {
+    min-height: 250px;
+  }
+
+  .ad-unit--articleMultiplex {
+    min-height: 200px;
+  }
+
+  .ad-unit--feedInline {
+    min-height: 120px;
+    max-width: 100%;
+  }
+
+  .ad-unit__label {
+    display: block;
+    font-size: 0.5625rem;
+    font-weight: 600;
+    color: var(--color-on-surface-variant);
+    letter-spacing: 0.06em;
+    margin-bottom: 0.25rem;
+    opacity: 0.6;
+  }
+
+  /* レスポンシブ対応 */
+  @media (max-width: 640px) {
+    .ad-unit {
+      margin: 1rem -0.25rem;
+      padding: 0.5rem;
+      max-width: 100%;
+    }
+
+    .ad-unit--articleTop,
+    .ad-unit--articleBottom,
+    .ad-unit--homepageDisplay {
+      min-height: 80px;
+    }
+
+    .ad-unit--articleMid {
+      min-height: 200px;
+    }
+  }
+</style>

@@ -1,0 +1,346 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro'
+import NewsletterCTA from '../../components/NewsletterCTA.astro'
+import NoteDeepDiveLink from '../../components/NoteDeepDiveLink.astro'
+import ShareButtons from '../../components/ShareButtons.astro'
+import AdUnit from '../../components/AdUnit.astro'
+import { getCollection } from 'astro:content'
+import { filterPublished } from '../../lib/date-filter'
+import { AD_CLIENT, AD_SLOTS } from '../../constants/ad-config'
+
+export async function getStaticPaths() {
+  const articles = filterPublished(await getCollection('deep-dive'))
+  return articles.map((article) => ({
+    params: { slug: article.slug },
+    props: { article },
+  }))
+}
+
+const { article } = Astro.props
+const { Content } = await article.render()
+
+const readingTime = Math.ceil(article.body.length / 600)
+const wordCount = article.body.length
+
+const canonicalURL = new URL(`/deep-dive/${article.slug}/`, Astro.site)
+const articleSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'Article',
+  headline: article.data.title,
+  description: article.data.summary,
+  datePublished: `${article.data.date}T09:00:00+09:00`,
+  dateModified: `${article.data.date}T09:00:00+09:00`,
+  url: canonicalURL.href,
+  mainEntityOfPage: { '@type': 'WebPage', '@id': canonicalURL.href },
+  author: {
+    '@type': 'Person',
+    name: 'Kaikei AI Daily編集部',
+    description: 'AI×会計の専門メディア。公認会計士試験合格者が監修。',
+    url: 'https://kaikei-ai.jp/about',
+    hasCredential: {
+      '@type': 'EducationalOccupationalCredential',
+      credentialCategory: '公認会計士試験合格',
+    },
+  },
+  publisher: {
+    '@type': 'Organization',
+    name: 'Kaikei AI Daily',
+    url: 'https://kaikei-ai.jp',
+    logo: { '@type': 'ImageObject', url: 'https://kaikei-ai.jp/favicon.svg' },
+  },
+  image: new URL(`/og/deep-dive/${article.slug}.png`, Astro.site).toString(),
+  inLanguage: 'ja',
+  keywords: article.data.tags?.join(', '),
+  articleSection: article.data.category || 'analysis',
+  wordCount: wordCount,
+}
+
+const breadcrumbSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'BreadcrumbList',
+  itemListElement: [
+    { '@type': 'ListItem', position: 1, name: 'Kaikei AI Daily', item: 'https://kaikei-ai.jp/' },
+    { '@type': 'ListItem', position: 2, name: '深掘り解説', item: 'https://kaikei-ai.jp/deep-dive/' },
+    { '@type': 'ListItem', position: 3, name: article.data.title },
+  ],
+}
+---
+
+<BaseLayout title={article.data.title} description={article.data.summary} ogImage={new URL(`/og/deep-dive/${article.slug}.png`, Astro.site).toString()} ogType="article" structuredData={articleSchema}>
+  <script type="application/ld+json" set:html={JSON.stringify(breadcrumbSchema)} />
+  {AD_SLOTS.articleMid.slot && (
+    <script is:inline define:vars={{ adClient: AD_CLIENT, adSlot: AD_SLOTS.articleMid.slot }}>
+      window.__AD_SLOTS_articleMid = { client: adClient, slot: adSlot };
+    </script>
+  )}
+  <article class="deep-dive-article">
+    <header>
+      <a href="/deep-dive" class="back-link">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="15 18 9 12 15 6"/></svg>
+        深掘り解説一覧に戻る
+      </a>
+      <div class="article-meta">
+        <time class="article-date" datetime={article.data.date}>{article.data.date}</time>
+        <span class="reading-time">{`約${readingTime}分で読めます`}</span>
+        <span class="category-badge">{article.data.category}</span>
+      </div>
+      <h1>{article.data.title}</h1>
+      <p class="article-summary">{article.data.summary}</p>
+      <div class="article-tags">
+        {article.data.tags.map((tag) => (
+          <span class="tag">{tag}</span>
+        ))}
+      </div>
+      <ShareButtons title={article.data.title} url={canonicalURL.href} />
+    </header>
+
+    <!-- 広告: 記事タイトル直下 -->
+    <AdUnit name="articleTop" />
+
+    <div class="article-body" id="article-body">
+      <Content />
+    </div>
+
+    <!-- 広告: 記事本文直後 -->
+    <AdUnit name="articleBottom" />
+
+    <!-- 広告: マルチプレックス -->
+    <AdUnit name="articleMultiplex" />
+
+    <!-- note深掘り記事クロスリンク（タグ連動型） -->
+    <NoteDeepDiveLink tags={article.data.tags} title={article.data.title} articleType="deep-dive" />
+
+    <!-- 関連サービスCTA -->
+    <aside class="related-services" aria-label="関連サービス">
+      <h3 class="related-services-title">もっと深く学ぶ</h3>
+      <div class="related-services-grid">
+        <a href="https://ezark-tax-accounting.com/" target="_blank" rel="noopener noreferrer" class="service-link">
+          <span class="service-label">EZARK Blog</span>
+          <span class="service-desc">AI×税務・会計の詳細ガイド</span>
+        </a>
+        <a href="https://note.com/ezark_company" target="_blank" rel="noopener noreferrer" class="service-link">
+          <span class="service-label">note</span>
+          <span class="service-desc">AI×会計の深掘りテクニック</span>
+        </a>
+        <a href="https://ezark-devtools.booth.pm/" target="_blank" rel="noopener noreferrer" class="service-link">
+          <span class="service-label">BOOTH</span>
+          <span class="service-desc">経理AIプロンプト集・テンプレート</span>
+        </a>
+      </div>
+    </aside>
+
+    <!-- Newsletter CTA -->
+    <NewsletterCTA variant="compact" />
+
+    <div class="article-cta">
+      <p>最新の会計×AI深掘り解説を受け取る</p>
+      <a href="https://x.com/kaikeiAI_Lab" target="_blank" rel="noopener" class="btn btn-primary">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.744l7.73-8.835L1.254 2.25H8.08l4.253 5.622zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+        X でフォロー
+      </a>
+    </div>
+  </article>
+
+  <script>
+    // 記事内広告: h2の2つ目の前に自動挿入
+    (function() {
+      const body = document.getElementById('article-body');
+      if (!body) return;
+      const h2s = body.querySelectorAll('h2');
+      if (h2s.length < 2) return;
+      const target = h2s[1];
+      const adConfig = window.__AD_SLOTS_articleMid;
+      if (!adConfig) return;
+      const wrapper = document.createElement('aside');
+      wrapper.className = 'ad-unit ad-unit--articleMid';
+      wrapper.setAttribute('aria-label', '広告');
+      const label = document.createElement('span');
+      label.className = 'ad-unit__label';
+      label.textContent = '広告';
+      wrapper.appendChild(label);
+      const ins = document.createElement('ins');
+      ins.className = 'adsbygoogle';
+      ins.style.cssText = 'display:block; text-align:center;';
+      ins.dataset.adClient = adConfig.client;
+      ins.dataset.adSlot = adConfig.slot;
+      ins.dataset.adFormat = 'fluid';
+      ins.dataset.adLayout = 'in-article';
+      wrapper.appendChild(ins);
+      target.parentNode.insertBefore(wrapper, target);
+      try { (adsbygoogle = window.adsbygoogle || []).push({}); } catch(e) {}
+    })();
+  </script>
+
+  <script>
+    document.querySelectorAll('a[rel*="sponsored"]').forEach(link => {
+      link.addEventListener('click', () => {
+        if (typeof gtag === 'function') {
+          gtag('event', 'affiliate_click', {
+            event_category: 'monetization',
+            event_label: link.textContent?.trim() ?? '',
+            transport_type: 'beacon',
+          });
+        }
+      });
+    });
+  </script>
+</BaseLayout>
+
+<style>
+  .deep-dive-article { max-width: 720px; }
+
+  .back-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    font-size: 0.8125rem;
+    color: var(--color-on-surface-variant);
+    text-decoration: none;
+    margin-bottom: 1rem;
+  }
+  .back-link:hover { color: var(--color-primary); }
+
+  .article-meta {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .article-date { font-size: 0.75rem; color: var(--color-on-surface-variant); font-family: var(--font-mono); }
+
+  .reading-time { font-size: 0.75rem; color: var(--color-on-surface-variant); }
+
+  .category-badge {
+    display: inline-block;
+    font-size: 0.6875rem;
+    font-weight: 700;
+    background: var(--color-primary);
+    color: white;
+    padding: 0.15rem 0.5rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  header h1 { font-size: 1.75rem; font-weight: 800; margin: 0.5rem 0; line-height: 1.4; }
+  .article-summary { font-size: 1rem; color: var(--color-on-surface-variant); line-height: 1.7; margin-bottom: 0.75rem; }
+
+  .article-tags { display: flex; gap: 0.375rem; flex-wrap: wrap; margin-bottom: 1.5rem; }
+  .tag { font-size: 0.6875rem; padding: 0.125rem 0.5rem; background: var(--color-surface-variant); border: 1px solid var(--color-border); color: var(--color-on-surface-variant); font-weight: 500; }
+
+  /* ── Article Body ── */
+  .article-body { font-size: 0.9375rem; line-height: 1.85; }
+  .article-body :global(h2) { font-size: 1.25rem; font-weight: 700; margin: 2rem 0 0.75rem; padding-bottom: 0.5rem; border-bottom: 4px solid var(--color-border); }
+  .article-body :global(h3) { font-size: 1.0625rem; font-weight: 700; margin: 1.5rem 0 0.5rem; }
+  .article-body :global(p) { margin-bottom: 1rem; }
+  .article-body :global(ul), .article-body :global(ol) { margin: 0.5rem 0 1rem 1.25rem; }
+  .article-body :global(li) { margin-bottom: 0.25rem; }
+  .article-body :global(pre) { background: var(--color-surface); border: 4px solid var(--color-border); padding: 1rem; overflow-x: auto; margin: 1rem 0; font-size: 0.8125rem; }
+  .article-body :global(code) { font-family: var(--font-mono); font-size: 0.85em; }
+  .article-body :global(table) { width: 100%; border-collapse: collapse; margin: 1rem 0; font-size: 0.875rem; }
+  .article-body :global(th), .article-body :global(td) { border: 1px solid var(--color-border); padding: 0.5rem; text-align: left; }
+  .article-body :global(th) { background: var(--color-surface-variant); font-weight: 600; }
+  .article-body :global(hr) { border: none; border-top: 4px solid var(--color-border); margin: 2rem 0; }
+
+  /* ── CTA ── */
+  .article-cta {
+    text-align: center;
+    padding: 2.5rem 0;
+    margin-top: 2rem;
+    border-top: 4px solid var(--color-on-surface);
+  }
+  .article-cta p { font-size: 0.9375rem; color: var(--color-on-surface-variant); margin-bottom: 1rem; }
+
+  /* ── Button (Neo-Brutalism) ── */
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.625rem 1.5rem;
+    font-size: 0.875rem;
+    font-weight: 700;
+    text-decoration: none;
+    border: 3px solid var(--color-outline);
+    box-shadow: 4px 4px 0 var(--color-outline);
+    transition: transform 0.1s, box-shadow 0.1s;
+    cursor: pointer;
+  }
+
+  .btn-primary {
+    background: var(--color-primary);
+    color: white;
+  }
+
+  .btn-primary:hover {
+    transform: translate(-2px, -2px);
+    box-shadow: 6px 6px 0 var(--color-outline);
+  }
+
+  /* ── 関連サービスCTA ── */
+  .related-services {
+    margin-top: 2rem;
+    margin-bottom: 1.5rem;
+    padding: 1.25rem;
+    background: var(--color-surface);
+    border: 3px solid var(--color-border);
+  }
+
+  .related-services-title {
+    font-size: 0.875rem;
+    font-weight: 700;
+    margin-bottom: 0.75rem;
+    color: var(--color-on-surface);
+  }
+
+  .related-services-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .service-link {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.625rem 0.875rem;
+    background: var(--color-surface-variant);
+    border: 2px solid var(--color-border);
+    text-decoration: none;
+    transition: border-color 0.15s;
+    min-height: 44px;
+  }
+
+  .service-link:hover {
+    border-color: var(--color-primary);
+  }
+
+  .service-label {
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: var(--color-primary);
+    white-space: nowrap;
+    min-width: 5rem;
+  }
+
+  .service-desc {
+    font-size: 0.8125rem;
+    color: var(--color-on-surface-variant);
+  }
+
+  @media (min-width: 640px) {
+    .related-services-grid {
+      flex-direction: row;
+    }
+    .service-link {
+      flex: 1;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 0.25rem;
+    }
+    .service-label { min-width: auto; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .btn { transition: none; }
+  }
+</style>

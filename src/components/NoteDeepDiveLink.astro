@@ -1,0 +1,200 @@
+---
+/**
+ * NoteDeepDiveLink: Kaikei AI Daily → note.com cross-link
+ * Shows topic-matched note articles for deeper reading on AI x accounting.
+ */
+interface Props {
+  tags?: string[];
+  title?: string;
+  articleType?: 'daily' | 'deep-dive' | 'tips' | 'weekly';
+}
+
+const { tags = [], title = '', articleType = 'daily' } = Astro.props;
+
+// Topic mapping: Kaikei tags → note articles about AI x accounting
+const noteArticles: { keywords: string[]; title: string; url: string; desc: string }[] = [
+  {
+    keywords: ['freee', 'マネーフォワード', '弥生', 'クラウド会計', '会計ソフト', '導入', '比較'],
+    title: '経理AI活用で月50時間削減',
+    url: 'https://note.com/ezark_company/n/n7705980a3472',
+    desc: '3大クラウド会計ソフトのAI機能を実務視点で徹底比較',
+  },
+  {
+    keywords: ['ChatGPT', 'Claude', 'AI活用', 'プロンプト', 'LLM', '生成AI'],
+    title: 'ChatGPTプロンプト5テクニック',
+    url: 'https://note.com/ezark_company/n/nd0e57e84426c',
+    desc: 'AIとの協働開発の実践テクニック',
+  },
+  {
+    keywords: ['自動化', 'RPA', 'ワークフロー', '効率化', 'DX'],
+    title: 'AIコード生成プロンプト5鉄則',
+    url: 'https://note.com/ezark_company/n/nd6ad0696b987',
+    desc: 'AIで経理業務を自動化する具体的手法',
+  },
+  {
+    keywords: ['確定申告', '青色申告', 'インボイス', '電帳法', '税制改正', '年末調整'],
+    title: '確定申告2026チェックリスト',
+    url: 'https://note.com/ezark_company/n/nb04855791d7d',
+    desc: '確定申告のAI活用テクニックと最新制度対応',
+  },
+  {
+    keywords: ['データ分析', 'SQL', 'BI', '経営分析', 'ダッシュボード'],
+    title: '経理AI活用で月50時間削減',
+    url: 'https://note.com/ezark_company/n/n7705980a3472',
+    desc: 'AIを活用したデータ分析・レポーティング',
+  },
+  {
+    keywords: ['監査', 'AI監査', '内部統制', 'コンプライアンス'],
+    title: '経理AI活用で月50時間削減',
+    url: 'https://note.com/ezark_company/n/n7705980a3472',
+    desc: 'AI時代の監査・内部統制の最新動向',
+  },
+  {
+    keywords: ['API', '開発', 'エンジニア', 'プログラミング', 'システム'],
+    title: 'Docker x AI開発環境の完全構築ガイド',
+    url: 'https://note.com/ezark_company/n/nb73e6ddc44c5',
+    desc: '会計システムとAI APIの連携テクニック',
+  },
+];
+
+// Match based on tags and title
+const tagStr = [...tags.map(t => t.toLowerCase()), ...title.toLowerCase().split(/[\s/×・]+/)].join(' ');
+
+const matched = noteArticles
+  .filter(article => article.keywords.some(kw => tagStr.includes(kw.toLowerCase())))
+  .slice(0, 2);
+
+// If no tag match, show default accounting article
+const displayArticles = matched.length > 0 ? matched : [{
+  keywords: [],
+  title: 'AI×会計の実践テクニックをnoteで公開中',
+  url: 'https://note.com/ezark_company/n/n7705980a3472',
+  desc: 'クラウド会計ソフト比較・ChatGPT活用・業務自動化の実践ガイド',
+}];
+
+const sectionTitle = articleType === 'deep-dive' ? '関連する深掘り記事' :
+  articleType === 'tips' ? 'さらに深く学ぶ' :
+  articleType === 'weekly' ? '今週のおすすめ深掘り' :
+  '関連する深掘り記事';
+---
+
+<aside class="note-deepdive" aria-label="noteで深掘り記事を読む">
+  <div class="note-deepdive-header">
+    <span class="note-deepdive-badge">note</span>
+    <h3 class="note-deepdive-title">{sectionTitle}</h3>
+  </div>
+  <ul class="note-deepdive-list">
+    {displayArticles.map((article) => (
+      <li>
+        <a href={article.url} target="_blank" rel="noopener noreferrer" class="note-deepdive-link">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" class="note-deepdive-arrow">
+            <line x1="7" y1="17" x2="17" y2="7"/>
+            <polyline points="7 7 17 7 17 17"/>
+          </svg>
+          <div>
+            <span class="note-deepdive-article-title">{article.title}</span>
+            <span class="note-deepdive-article-desc">{article.desc}</span>
+          </div>
+        </a>
+      </li>
+    ))}
+  </ul>
+  <a href="https://note.com/ezark_company" target="_blank" rel="noopener noreferrer" class="note-deepdive-more">
+    note記事一覧を見る →
+  </a>
+</aside>
+
+<style>
+  .note-deepdive {
+    margin-bottom: 1.5rem;
+    padding: 1rem 1.25rem;
+    background: var(--color-surface);
+    border: 3px solid #41c350;
+    border-left-width: 6px;
+  }
+
+  .note-deepdive-header {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.75rem;
+  }
+
+  .note-deepdive-badge {
+    display: inline-block;
+    font-size: 0.625rem;
+    font-weight: 800;
+    background: #41c350;
+    color: white;
+    padding: 0.125rem 0.5rem;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+  }
+
+  .note-deepdive-title {
+    font-size: 0.875rem;
+    font-weight: 700;
+    color: var(--color-on-surface);
+    margin: 0;
+  }
+
+  .note-deepdive-list {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 0.75rem 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .note-deepdive-link {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.625rem;
+    padding: 0.625rem 0.75rem;
+    background: var(--color-surface-variant);
+    border: 2px solid var(--color-border);
+    text-decoration: none;
+    transition: border-color 0.15s;
+    min-height: 44px;
+  }
+
+  .note-deepdive-link:hover {
+    border-color: #41c350;
+  }
+
+  .note-deepdive-arrow {
+    color: #41c350;
+    flex-shrink: 0;
+    margin-top: 0.125rem;
+  }
+
+  .note-deepdive-article-title {
+    display: block;
+    font-size: 0.8125rem;
+    font-weight: 600;
+    color: var(--color-on-surface);
+    line-height: 1.4;
+  }
+
+  .note-deepdive-article-desc {
+    display: block;
+    font-size: 0.6875rem;
+    color: var(--color-on-surface-variant);
+    margin-top: 0.125rem;
+  }
+
+  .note-deepdive-more {
+    display: inline-block;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #41c350;
+    text-decoration: none;
+    transition: opacity 0.15s;
+  }
+
+  .note-deepdive-more:hover {
+    opacity: 0.75;
+    text-decoration: underline;
+  }
+</style>

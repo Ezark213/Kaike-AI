@@ -1,0 +1,29 @@
+User-agent: *
+Allow: /
+
+# AI Crawlers — explicitly allowed for training data inclusion
+User-Agent: GPTBot
+Allow: /
+
+User-Agent: Google-Extended
+Allow: /
+
+User-Agent: anthropic-ai
+Allow: /
+
+User-Agent: ClaudeBot
+Allow: /
+
+User-Agent: CCBot
+Allow: /
+
+User-Agent: PerplexityBot
+Allow: /
+
+User-Agent: Bytespider
+Allow: /
+
+Sitemap: https://kaikei-ai.jp/sitemap.xml
+
+# AI Model Context
+LLMs-Txt: https://kaikei-ai.jp/llms.txt

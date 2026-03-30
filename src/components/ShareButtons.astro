@@ -1,0 +1,115 @@
+---
+interface Props {
+  title: string
+  url: string
+}
+
+const { title, url } = Astro.props
+
+const twitterUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(title)}&url=${encodeURIComponent(url)}`
+const hatenaUrl = `https://b.hatena.ne.jp/add?mode=confirm&url=${encodeURIComponent(url)}&title=${encodeURIComponent(title)}`
+const lineUrl = `https://social-plugins.line.me/lineit/share?url=${encodeURIComponent(url)}`
+---
+
+<div class="share-buttons" role="group" aria-label="SNSでシェア">
+  <span class="share-label">シェア</span>
+  <a
+    href={twitterUrl}
+    target="_blank"
+    rel="noopener noreferrer"
+    class="share-btn share-btn--twitter"
+    aria-label="Xでシェアする"
+  >
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+      <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.744l7.73-8.835L1.254 2.25H8.08l4.253 5.622zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+    </svg>
+    <span>X</span>
+  </a>
+  <a
+    href={hatenaUrl}
+    target="_blank"
+    rel="noopener noreferrer"
+    class="share-btn share-btn--hatena"
+    aria-label="はてなブックマークに追加する"
+  >
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+      <path d="M20.47 21.2H3.53A1.28 1.28 0 0 1 2.25 19.92V4.08A1.28 1.28 0 0 1 3.53 2.8h16.94a1.28 1.28 0 0 1 1.28 1.28v15.84a1.28 1.28 0 0 1-1.28 1.28zM8.75 17.2h2.5V12h-2.5zM10 10.5a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3zM15.91 17.2c1.19 0 2.09-.84 2.09-2.36 0-1.24-.69-2.04-1.88-2.26v-.04c.98-.26 1.56-.97 1.56-1.94 0-1.32-.85-2.08-2.34-2.08h-2.84v8.68zm-1.27-5.04h-.64v-2.36h.72c.72 0 1.12.32 1.12.94s-.36 1.42-1.2 1.42zm.12 3.76h-.76v-2.6h.76c.88 0 1.36.44 1.36 1.28 0 .86-.44 1.32-1.36 1.32z"/>
+    </svg>
+    <span>はてブ</span>
+  </a>
+  <a
+    href={lineUrl}
+    target="_blank"
+    rel="noopener noreferrer"
+    class="share-btn share-btn--line"
+    aria-label="LINEでシェアする"
+  >
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+      <path d="M12 2C6.48 2 2 5.82 2 10.5c0 4.21 3.74 7.74 8.79 8.4.34.07.81.22.93.51.1.26.07.67.03.94l-.15.91c-.05.27-.21 1.05.92.57s6.1-3.59 8.33-6.15C22.63 13.63 22 10.5 22 10.5 22 5.82 17.52 2 12 2zm-3.08 11.25H6.58a.52.52 0 0 1-.52-.52V8.52a.52.52 0 0 1 1.04 0v3.69h1.82a.52.52 0 0 1 0 1.04zm1.97-.52a.52.52 0 0 1-1.04 0V8.52a.52.52 0 0 1 1.04 0zm4.27 0a.52.52 0 0 1-.37.5.52.52 0 0 1-.58-.15l-2.38-3.24v2.89a.52.52 0 0 1-1.04 0V8.52a.52.52 0 0 1 .37-.5.52.52 0 0 1 .58.15l2.38 3.24V8.52a.52.52 0 0 1 1.04 0zm2.84-3.19a.52.52 0 0 1 0 1.04h-1.82v1.04h1.82a.52.52 0 0 1 0 1.04h-2.34a.52.52 0 0 1-.52-.52V8.52c0-.29.23-.52.52-.52H18a.52.52 0 0 1 0 1.04h-1.82v1.04H18a.52.52 0 0 1 0 .46z"/>
+    </svg>
+    <span>LINE</span>
+  </a>
+</div>
+
+<style>
+  .share-buttons {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin: 1rem 0 1.5rem;
+    flex-wrap: wrap;
+  }
+
+  .share-label {
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: var(--color-on-surface-variant);
+    letter-spacing: 0.05em;
+  }
+
+  .share-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    padding: 0.375rem 0.75rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-decoration: none;
+    border: 3px solid var(--color-outline);
+    box-shadow: 3px 3px 0 var(--color-shadow);
+    transition: transform 0.1s, box-shadow 0.1s;
+    cursor: pointer;
+    min-height: 36px;
+  }
+
+  .share-btn:hover {
+    transform: translate(-2px, -2px);
+    box-shadow: 5px 5px 0 var(--color-shadow);
+  }
+
+  .share-btn:active {
+    transform: translate(1px, 1px);
+    box-shadow: 1px 1px 0 var(--color-shadow);
+  }
+
+  .share-btn--twitter {
+    background: #0f1419;
+    color: #ffffff;
+  }
+
+  .share-btn--hatena {
+    background: #00a4de;
+    color: #ffffff;
+  }
+
+  .share-btn--line {
+    background: #06c755;
+    color: #ffffff;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .share-btn {
+      transition: none;
+    }
+  }
+</style>

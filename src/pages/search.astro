@@ -1,0 +1,28 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+---
+<BaseLayout title="記事検索 | Kaikei AI Daily" description="AI×会計の記事をキーワードで検索">
+  <main class="search-page">
+    <h1>記事検索</h1>
+    <div id="search"></div>
+  </main>
+</BaseLayout>
+
+<link href="/pagefind/pagefind-ui.css" rel="stylesheet">
+<script is:inline src="/pagefind/pagefind-ui.js"></script>
+<script is:inline>
+  window.addEventListener('DOMContentLoaded', () => {
+    new PagefindUI({ element: "#search", showSubResults: true });
+  });
+</script>
+
+<style>
+  .search-page {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 2rem 1rem;
+  }
+  .search-page h1 {
+    margin-bottom: 1.5rem;
+  }
+</style>

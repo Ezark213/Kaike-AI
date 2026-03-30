@@ -1,0 +1,77 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro"
+import { getCollection } from "astro:content"
+import { filterPublished } from "../../lib/date-filter"
+
+const allDeepDive = filterPublished(await getCollection("deep-dive"))
+const taxTags = ["税理士", "税務", "確定申告", "消費税", "インボイス", "年末調整", "会計事務所", "MAS監査", "DX", "補助金"]
+const deepDives = allDeepDive
+  .filter(a => a.data.tags.some(t => taxTags.includes(t)))
+  .sort((a, b) => new Date(b.data.date).getTime() - new Date(a.data.date).getTime())
+
+const recommended = [
+  { slug: "ai-kaikei-jimusho-dx-2026", title: "AI×会計事務所の業務改善2026" },
+  { slug: "ai-shouhizei-invoice-2026", title: "AI×消費税・インボイス確定申告" },
+  { slug: "ai-zeirishi-mirai-2026", title: "AIが変える税理士の未来" },
+  { slug: "ai-nenmatsu-chosei-kanzen-2026", title: "AI×年末調整完全自動化" },
+  { slug: "ai-hojokin-kaikei-2026", title: "AI×補助金・助成金の会計処理" },
+]
+---
+<BaseLayout title="税理士・税務スタッフのためのAI活用ガイド" description="税理士事務所スタッフ向け。記帳代行のAI自動化、顧問先へのクラウド会計導入支援、インボイス対応、年末調整効率化まで。会計事務所DXの実践情報をCPA試験合格者が監修。">
+  <main id="main-content" class="persona-page">
+    <section class="persona-hero tax-hero">
+      <div class="persona-hero-inner">
+        <span class="persona-badge">税理士・税務スタッフ向け</span>
+        <h1>記帳代行から経営コンサルへ</h1>
+        <p>AI自動化で記帳代行を効率化し、空いた時間で高付加価値サービスへ。<br/>会計事務所のDX実践ガイド。</p>
+      </div>
+    </section>
+    <section class="recommended-section">
+      <h2>まず読んでほしい記事</h2>
+      <div class="recommended-grid">
+        {recommended.map(r => (
+          <a href={`/deep-dive/${r.slug}/`} class="recommended-card">
+            <span class="recommended-title">{r.title}</span>
+            <span class="recommended-arrow">→</span>
+          </a>
+        ))}
+      </div>
+    </section>
+    <section class="articles-section">
+      <h2>深掘り解説（{deepDives.length}本）</h2>
+      <div class="articles-list">
+        {deepDives.map(article => (
+          <article class="article-card">
+            <time datetime={article.data.date}>{article.data.date}</time>
+            <h3><a href={`/deep-dive/${article.slug}/`}>{article.data.title}</a></h3>
+            <p>{article.data.summary.substring(0, 100)}...</p>
+          </article>
+        ))}
+      </div>
+    </section>
+  </main>
+</BaseLayout>
+<style>
+  .persona-page { max-width: 900px; margin: 0 auto; padding: 0 1rem; }
+  .tax-hero { background: linear-gradient(135deg, #1b5e20, #00695c); color: white; padding: 3rem 2rem; border-radius: 12px; margin: 2rem 0; }
+  .persona-hero-inner { max-width: 700px; }
+  .persona-badge { background: rgba(255,255,255,0.2); padding: 0.25rem 0.75rem; border-radius: 20px; font-size: 0.85rem; }
+  .tax-hero h1 { font-size: 2rem; margin: 1rem 0 0.5rem; }
+  .tax-hero p { opacity: 0.9; line-height: 1.8; }
+  .recommended-section { margin: 2rem 0; }
+  .recommended-section h2 { font-size: 1.3rem; margin-bottom: 1rem; }
+  .recommended-grid { display: grid; gap: 0.75rem; }
+  .recommended-card { display: flex; justify-content: space-between; align-items: center; padding: 1rem 1.25rem; background: var(--color-surface-variant, #f4f6f9); border: 2px solid var(--color-outline, #d1d5db); border-radius: 8px; text-decoration: none; color: inherit; transition: transform 0.15s; }
+  .recommended-card:hover { transform: translateX(4px); border-color: var(--color-primary, #0066cc); }
+  .recommended-title { font-weight: 600; }
+  .recommended-arrow { font-size: 1.2rem; color: var(--color-primary, #0066cc); }
+  .articles-section { margin: 3rem 0; }
+  .articles-section h2 { font-size: 1.3rem; margin-bottom: 1rem; border-bottom: 2px solid var(--color-outline, #d1d5db); padding-bottom: 0.5rem; }
+  .articles-list { display: grid; gap: 1rem; }
+  .article-card { padding: 1rem; border: 1px solid var(--color-outline, #e5e7eb); border-radius: 8px; }
+  .article-card time { font-size: 0.8rem; color: var(--color-on-surface-variant, #6b7280); }
+  .article-card h3 { font-size: 1rem; margin: 0.25rem 0; }
+  .article-card h3 a { text-decoration: none; color: inherit; }
+  .article-card h3 a:hover { color: var(--color-primary, #0066cc); }
+  .article-card p { font-size: 0.85rem; color: var(--color-on-surface-variant, #6b7280); margin: 0.25rem 0 0; }
+</style>
