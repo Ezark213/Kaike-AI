@@ -101,6 +101,16 @@ npm test
 | BOOTH | 経理AIプロンプト集販売 |
 | note | 週刊AI会計レポート配信 |
 
+## TODO
+
+- [ ] **AdSense広告ユニット作成・スロットID設定** — [AdSense管理画面](https://www.google.com/adsense/)で以下6つの広告ユニットを作成し、`src/constants/ad-config.ts` にスロットIDを記入。設定後に再ビルド＆デプロイ。
+  - [ ] `articleTop` — ディスプレイ広告（記事タイトル直下）
+  - [ ] `articleMid` — 記事内広告（本文中h2の2つ目の前）
+  - [ ] `articleBottom` — ディスプレイ広告（本文終了直後）
+  - [ ] `articleMultiplex` — マルチプレックス広告（ナビゲーション下）
+  - [ ] `feedInline` — フィード内広告（一覧の5記事ごと）
+  - [ ] `homepageDisplay` — ディスプレイ広告（週刊セクション上）
+
 ## ライセンス
 
 Private repository. All rights reserved.
