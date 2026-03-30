@@ -103,13 +103,13 @@ npm test
 
 ## TODO
 
-- [ ] **AdSense広告ユニット作成・スロットID設定** — [AdSense管理画面](https://www.google.com/adsense/)で以下6つの広告ユニットを作成し、`src/constants/ad-config.ts` にスロットIDを記入。設定後に再ビルド＆デプロイ。
-  - [ ] `articleTop` — ディスプレイ広告（記事タイトル直下）
-  - [ ] `articleMid` — 記事内広告（本文中h2の2つ目の前）
-  - [ ] `articleBottom` — ディスプレイ広告（本文終了直後）
-  - [ ] `articleMultiplex` — マルチプレックス広告（ナビゲーション下）
-  - [ ] `feedInline` — フィード内広告（一覧の5記事ごと）
-  - [ ] `homepageDisplay` — ディスプレイ広告（週刊セクション上）
+- [x] **AdSense広告ユニット作成・スロットID設定** — `src/constants/ad-config.ts` に全6スロットID設定済み。再ビルド＆デプロイで有効化。
+  - [x] `articleTop` — ディスプレイ広告（`3780121659`）
+  - [x] `articleMid` — 記事内広告（`6214713307`）
+  - [x] `articleBottom` — ディスプレイ広告（`5740070584`）
+  - [x] `articleMultiplex` — マルチプレックス広告（`2142667000`）
+  - [x] `feedInline` — フィード内広告（`6023141614`）
+  - [x] `homepageDisplay` — ディスプレイ広告（`5528114334`）
 
 ## ライセンス
 
