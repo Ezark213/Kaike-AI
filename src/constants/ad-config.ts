@@ -20,36 +20,36 @@ export const AD_CLIENT = 'ca-pub-3306648647011539';
 export const AD_SLOTS = {
   /** 記事ページ: タイトル直下・本文直前 (ディスプレイ広告) */
   articleTop: {
-    slot: '',
+    slot: '3780121659',
     format: 'auto' as const,
     responsive: true,
   },
   /** 記事ページ: 本文中 h2の2つ目の前 (記事内広告) */
   articleMid: {
-    slot: '',
+    slot: '6214713307',
     format: 'fluid' as const,
     layout: 'in-article',
   },
   /** 記事ページ: 本文終了直後 (ディスプレイ広告) */
   articleBottom: {
-    slot: '',
+    slot: '5740070584',
     format: 'auto' as const,
     responsive: true,
   },
   /** 記事ページ: ナビゲーション下 (マルチプレックス広告) */
   articleMultiplex: {
-    slot: '',
+    slot: '2142667000',
     format: 'autorelaxed' as const,
   },
   /** トップページ/一覧: フィード内広告 */
   feedInline: {
-    slot: '',
+    slot: '6023141614',
     format: 'fluid' as const,
-    layoutKey: '-fb+5w+4e-db+86',
+    layoutKey: '-6t+ed+2i-1n-4w',
   },
   /** トップページ: 週刊セクション上 (ディスプレイ広告) */
   homepageDisplay: {
-    slot: '',
+    slot: '5528114334',
     format: 'auto' as const,
     responsive: true,
   },
